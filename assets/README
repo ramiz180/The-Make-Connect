@@ -1,0 +1,11 @@
+I have created the project MakeConnect and set up the folder structure. Here is what each folder is for:
+
+src/: This is the "Source" folder. All our code lives here.
+components/: Reusable UI parts like Buttons, Cards, and Headers. If we use it more than once, it goes here.
+screens/: The full pages of the app (e.g., LoginScreen, HomeScreen, ProfileScreen).
+navigation/: Handles moving between screens (like clicking a button to go to Profile).
+services/: Code that talks to the outside world (APIs, Backend). We will put our Mock Data logic here.
+utils/: Helper functions (e.g., a function to calculate distance or format dates).
+constants/: Fixed values like Colors, FontSizes, and Strings. This makes it easy to change the app's theme later.
+assets/: Images, Icons, and Fonts.
+data/: This is where we will put our Mock Data (fake users, workers, and chats) for now.
