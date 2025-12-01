@@ -7,28 +7,61 @@ export default function LoginScreen({ navigation }) {
     const [otpSent, setOtpSent] = useState(false);
     const [otp, setOtp] = useState('');
 
-    // Step 1: Mock sending OTP
-    const handleSendOtp = () => {
-        if (phoneNumber.length < 10) {
+    // Backend base URL
+    const BASE_URL = 'http://192.168.31.44:5000';  // replace with your actual PC IP
+
+
+    // Step 1: Send OTP
+    const handleSendOtp = async () => {
+        if (phoneNumber.length !== 10) {
             Alert.alert('Invalid Phone', 'Please enter a valid 10-digit phone number.');
             return;
         }
-        // In a real app, we would call an API here.
-        // For now, we just pretend we sent it.
-        setOtpSent(true);
-        Alert.alert('OTP Sent', 'Your mock OTP is 4321');
+
+        try {
+            const res = await fetch(`${BASE_URL}/api/send-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phoneNumber })
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                setOtpSent(true);
+                Alert.alert('OTP Sent', `Your OTP is ${data.otp}`); // Remove OTP in production
+            } else {
+                Alert.alert('Error', data.message);
+            }
+        } catch (err) {
+            console.log(err);
+            Alert.alert('Error', 'Something went wrong while sending OTP');
+        }
     };
 
-    // Step 2: Mock verifying OTP
-    const handleVerifyOtp = () => {
-        if (otp === '4321') {
-            // OTP is correct!
-            // Now we need to ask the user for their Role (Customer or Worker)
-            // We will navigate to a "RoleSelection" screen (we will build this next)
-            Alert.alert('Success', 'Login Successful!');
-            navigation.replace('RoleSelection');
-        } else {
-            Alert.alert('Error', 'Invalid OTP. Try 1234.');
+    // Step 2: Verify OTP
+    const handleVerifyOtp = async () => {
+        if (otp.length !== 4) {
+            Alert.alert('Invalid OTP', 'Please enter a 4-digit OTP.');
+            return;
+        }
+
+        try {
+            const res = await fetch(`${BASE_URL}/api/verify-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phoneNumber, otp })
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                Alert.alert('Success', 'Login Successful!');
+                navigation.replace('RoleSelection');
+            } else {
+                Alert.alert('Error', data.message);
+            }
+        } catch (err) {
+            console.log(err);
+            Alert.alert('Error', 'Something went wrong while verifying OTP');
         }
     };
 
@@ -40,7 +73,6 @@ export default function LoginScreen({ navigation }) {
                 <Text style={styles.subtitle}>Find local workers or get hired.</Text>
 
                 {!otpSent ? (
-                    // Phone Number Input View
                     <View style={styles.inputContainer}>
                         <Text style={styles.label}>Enter Phone Number</Text>
                         <TextInput
@@ -56,7 +88,6 @@ export default function LoginScreen({ navigation }) {
                         </TouchableOpacity>
                     </View>
                 ) : (
-                    // OTP Input View
                     <View style={styles.inputContainer}>
                         <Text style={styles.label}>Enter OTP</Text>
                         <TextInput
@@ -127,7 +158,7 @@ const styles = StyleSheet.create({
     button: {
         width: '100%',
         height: 50,
-        backgroundColor: '#007AFF', // Standard Blue
+        backgroundColor: '#007AFF',
         borderRadius: 8,
         justifyContent: 'center',
         alignItems: 'center',
