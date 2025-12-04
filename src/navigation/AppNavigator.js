@@ -3,15 +3,15 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 // Auth screens
-import SplashScreen from "../screens/SplashScreen";
-import WelcomeScreen from "../screens/WelcomeScreen";
-import LoginScreen from "../screens/LoginScreen";
-import OTPScreen from "../screens/OTPScreen";
-import RoleSelectionScreen from "../screens/RoleSelectionScreen";
+import SplashScreen from "../screens/Common/SplashScreen";
+import WelcomeScreen from "../screens/Common/WelcomeScreen";
+import OTPScreen from "../screens/Common/OTPScreen";
+import RoleSelectionScreen from "../screens/Common/RoleSelectionScreen";
 
 
 // Location
-import SetLocationScreen from "../screens/SetLocationScreen";
+import CustomerSetLocationScreen from "../screens/customer/CustomerSetLocationScreen";
+import WorkerSetLocationScreen from "../screens/worker/WorkerSetLocationScreen";
 
 // Customer Screens + Tabs
 import CustomerTabs from "./CustomerTabs";
@@ -39,12 +39,13 @@ export default function AppNavigator() {
         {/* AUTH */}
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
+        {/* <Stack.Screen name="Login" component={LoginScreen} /> */}
         <Stack.Screen name="OTP" component={OTPScreen} />
         <Stack.Screen name="RoleSelection" component={RoleSelectionScreen} />
 
         {/* LOCATION */}
-        <Stack.Screen name="SetLocation" component={SetLocationScreen} />
+        <Stack.Screen name="CustomerSetLocation" component={CustomerSetLocationScreen} />
+        <Stack.Screen name="WorkerSetLocationScreen" component={WorkerSetLocationScreen} />
 
         {/* CUSTOMER */}
         <Stack.Screen name="CustomerTabs" component={CustomerTabs} />

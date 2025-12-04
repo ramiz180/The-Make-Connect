@@ -21,14 +21,14 @@ export default function RoleSelectionScreen({ navigation, route }) {
     if (!selected) return;
 
     if (selected === "CUSTOMER") {
-      navigation.navigate("SetLocation", {
+      navigation.navigate("CustomerSetLocation", {
         nextScreen: "CustomerTabs",  // ✅ Changed to CustomerTabs
         userId: fakeUserId,
         phone,
         name,
       });
     } else {
-      navigation.navigate("WorkerSetup", {
+      navigation.navigate("WorkerSetLocationScreen", {
         userId: fakeUserId,
         phone,
         name,

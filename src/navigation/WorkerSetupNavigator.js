@@ -6,7 +6,7 @@ import WorkerCategory from "../screens/workerSetup/WorkerCategory";
 import WorkerPortfolio from "../screens/workerSetup/WorkerPortfolio";
 import WorkerVerification from "../screens/workerSetup/WorkerVerification";
 import WorkerRadius from "../screens/workerSetup/WorkerRadius";
-
+import WorkerSetLocationScreen from "../screens/worker/WorkerSetLocationScreen";
 const Stack = createNativeStackNavigator();
 
 export default function WorkerSetupNavigator() {

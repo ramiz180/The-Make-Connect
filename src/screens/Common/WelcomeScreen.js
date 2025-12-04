@@ -6,6 +6,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 
 const WelcomeScreen = ({ navigation }) => {
     const [phoneNumber, setPhoneNumber] = useState('');
+    const isValid = phoneNumber.length === 10;
 
     return (
         <KeyboardAvoidingView
@@ -49,11 +50,16 @@ const WelcomeScreen = ({ navigation }) => {
                                 keyboardType="phone-pad"
                                 value={phoneNumber}
                                 onChangeText={setPhoneNumber}
+                                maxLength={10}
                             />
 
                             <TouchableOpacity
-                                style={styles.primaryButton}
+                                style={[
+                                    styles.primaryButton,
+                                    !isValid && styles.primaryButtonDisabled,
+                                ]}
                                 onPress={() => navigation.navigate('OTP', { phoneNumber })}
+                                disabled={!isValid}
                             >
                                 <Text style={styles.primaryButtonText}>Continue</Text>
                             </TouchableOpacity>
@@ -136,6 +142,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
+    },
+    primaryButtonDisabled: {
+        backgroundColor: 'rgba(49, 254, 131, 0.4)',
     },
     primaryButtonText: {
         color: '#000000',

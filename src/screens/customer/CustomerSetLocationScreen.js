@@ -11,7 +11,7 @@ import * as Location from "expo-location";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MapView, { Marker } from "react-native-maps";
 
-export default function SetLocationScreen({ navigation, route }) {
+export default function CustomerSetLocationScreen({ navigation, route }) {
   const { nextScreen, userId, phone, name } = route.params || {};
 
   const [loading, setLoading] = useState(true);
