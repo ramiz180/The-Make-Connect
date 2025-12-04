@@ -1,82 +1,138 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+  Image,
+} from "react-native";
+import * as Location from "expo-location";
+import { SafeAreaView } from "react-native-safe-area-context";
+import MapView, { Marker } from "react-native-maps";
 
-export default function SetLocationScreen() {
-  const navigation = useNavigation();
-  const route = useRoute();
-  const nextScreen = route.params?.nextScreen || 'CustomerHome';
-  const userId = route.params?.userId; // Get from previous signup
-  const [location, setLocation] = useState('');
-  const [radius, setRadius] = useState('5 km');
+export default function SetLocationScreen({ navigation, route }) {
+  const { nextScreen, userId, phone, name } = route.params || {};
 
-  const radiusOptions = ['2 km', '5 km', '10 km', 'City-wide'];
+  const [loading, setLoading] = useState(true);
+  const [coords, setCoords] = useState(null);
 
-  const handleConfirm = async () => {
-    if (!location) {
-      Alert.alert('Error', 'Please enter a location');
-      return;
-    }
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        alert("Permission denied. Please allow location access.");
+        setLoading(false);
+        return;
+      }
 
-    try {
-      // Save location to backend
-      await axios.post('http://YOUR_BACKEND_IP:5000/api/user/update-location', {
-        userId,
-        location,
-        serviceRadius: radius,
+      const loc = await Location.getCurrentPositionAsync({});
+      setCoords({
+        latitude: loc.coords.latitude,
+        longitude: loc.coords.longitude,
       });
 
-      // Navigate to CustomerHome
-      navigation.replace(nextScreen);
-    } catch (error) {
-      console.log(error);
-      Alert.alert('Error', 'Failed to save location');
-    }
+      setLoading(false);
+    })();
+  }, []);
+
+  const handleConfirm = () => {
+    if (!coords) return;
+
+    navigation.navigate(nextScreen, {
+      userId,
+      phone,
+      name,
+      location: coords,
+    });
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Set Your Location</Text>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.header}>Set Your Location</Text>
+      <Text style={styles.sub}>
+        This helps us show workers and services nearby.
+      </Text>
 
-      <TextInput
-        placeholder="Enter location"
-        value={location}
-        onChangeText={setLocation}
-        style={styles.input}
-      />
+      {loading ? (
+        <View style={styles.loaderWrap}>
+          <ActivityIndicator size="large" color="#00D786" />
+          <Text style={styles.loadText}>Fetching location...</Text>
+        </View>
+      ) : coords ? (
+        <MapView
+          style={styles.map}
+          initialRegion={{
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          }}
+        >
+          <Marker coordinate={coords} />
+        </MapView>
+      ) : (
+        <Text style={styles.error}>Unable to fetch location</Text>
+      )}
 
-      <Text style={{ marginTop: 20 }}>Select Radius:</Text>
-      <View style={styles.radiusRow}>
-        {radiusOptions.map((item) => (
-          <TouchableOpacity
-            key={item}
-            style={[styles.radiusBtn, radius === item && styles.activeRadius]}
-            onPress={() => setRadius(item)}
-          >
-            <Text style={[styles.radiusText, radius === item && styles.activeRadiusText]}>
-              {item}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <TouchableOpacity style={styles.confirmBtn} onPress={handleConfirm}>
-        <Text style={styles.confirmText}>Confirm Location</Text>
+      <TouchableOpacity
+        style={[styles.btn, !coords && styles.disabled]}
+        disabled={!coords}
+        onPress={handleConfirm}
+      >
+        <Text style={styles.btnText}>Confirm Location</Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
-  title: { fontSize: 20, fontWeight: 'bold' },
-  input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginTop: 10 },
-  radiusRow: { flexDirection: 'row', justifyContent: 'space-between', marginVertical: 10 },
-  radiusBtn: { padding: 10, borderRadius: 20, borderWidth: 1, borderColor: '#555' },
-  activeRadius: { backgroundColor: '#58ff7d', borderColor: '#58ff7d' },
-  radiusText: { color: '#555' },
-  activeRadiusText: { color: '#000', fontWeight: '700' },
-  confirmBtn: { backgroundColor: '#28a745', padding: 15, borderRadius: 12, marginTop: 20 },
-  confirmText: { color: '#fff', textAlign: 'center', fontWeight: '700' },
+  container: {
+    flex: 1,
+    backgroundColor: "#0B0F15",
+    padding: 20,
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#fff",
+  },
+  sub: {
+    color: "#A8B0BA",
+    marginTop: 4,
+    marginBottom: 20,
+  },
+  loaderWrap: {
+    alignItems: "center",
+    marginTop: 50,
+  },
+  loadText: {
+    marginTop: 10,
+    color: "#fff",
+  },
+  error: {
+    color: "#ff6b6b",
+    textAlign: "center",
+    marginTop: 20,
+  },
+  map: {
+    flex: 1,
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+  btn: {
+    backgroundColor: "#00D786",
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 20,
+  },
+  disabled: {
+    opacity: 0.5,
+  },
+  btnText: {
+    color: "#000",
+    fontSize: 16,
+    textAlign: "center",
+    fontWeight: "700",
+  },
 });
