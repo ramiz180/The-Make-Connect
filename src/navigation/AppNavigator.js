@@ -2,27 +2,28 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-// Auth
-import SplashScreen from '../screens/SplashScreen';
-import WelcomeScreen from '../screens/WelcomeScreen';
-import LoginScreen from '../screens/LoginScreen';
-import OTPScreen from '../screens/OTPScreen';
-import RoleSelectionScreen from '../screens/RoleSelectionScreen';
+// Auth screens
+import SplashScreen from "../screens/SplashScreen";
+import WelcomeScreen from "../screens/WelcomeScreen";
+import LoginScreen from "../screens/LoginScreen";
+import OTPScreen from "../screens/OTPScreen";
+import RoleSelectionScreen from "../screens/RoleSelectionScreen";
+
 
 // Location
 import SetLocationScreen from "../screens/SetLocationScreen";
 
-// Customer
-import CustomerHome from "../screens/customer/CustomerHome";
+// Customer Screens + Tabs
+import CustomerTabs from "./CustomerTabs";
 import WorkerList from "../screens/customer/WorkerList";
 import WorkerProfile from "../screens/customer/WorkerProfile";
 import ChatScreen from "../screens/customer/ChatScreen";
 import RateReviewScreen from "../screens/customer/RateReviewScreen";
 
-// Worker Setup (Navigator)
+// Worker Setup Navigator
 import WorkerSetupNavigator from "./WorkerSetupNavigator";
 
-// Worker Flow
+// Worker Screens
 import WorkerHome from "../screens/worker/WorkerHome";
 import WorkerChatScreen from "../screens/worker/WorkerChatScreen";
 import EditWorkerProfile from "../screens/worker/EditWorkerProfile";
@@ -33,7 +34,7 @@ const Stack = createNativeStackNavigator();
 export default function AppNavigator() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Splash">
 
         {/* AUTH */}
         <Stack.Screen name="Splash" component={SplashScreen} />
@@ -46,13 +47,13 @@ export default function AppNavigator() {
         <Stack.Screen name="SetLocation" component={SetLocationScreen} />
 
         {/* CUSTOMER */}
-        <Stack.Screen name="CustomerHome" component={CustomerHome} />
+        <Stack.Screen name="CustomerTabs" component={CustomerTabs} />
         <Stack.Screen name="WorkerList" component={WorkerList} />
         <Stack.Screen name="WorkerProfile" component={WorkerProfile} />
         <Stack.Screen name="CustomerChat" component={ChatScreen} />
         <Stack.Screen name="RateReview" component={RateReviewScreen} />
 
-        {/* WORKER SETUP FLOW */}
+        {/* WORKER SETUP */}
         <Stack.Screen name="WorkerSetup" component={WorkerSetupNavigator} />
 
         {/* WORKER */}

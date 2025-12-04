@@ -1,7 +1,15 @@
-const express = require('express');
+import express from "express";
+import {
+  updateUserDetails,
+  saveLocation,
+} from "../controllers/userController.js";
+
 const router = express.Router();
-const { updateLocation } = require('../controllers/userController');
 
-router.post('/update-location', updateLocation);
+// Update name, role
+router.post("/update", updateUserDetails);
 
-module.exports = router;
+// Save user location
+router.post("/location", saveLocation);
+
+export default router;

@@ -1,25 +1,28 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import connectDB from "./config/db.js";
 
-const authRoutes = require("./routes/auth");
+import authRoutes from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import workerRoutes from "./routes/workerRoutes.js";
+import bookingRoutes from "./routes/bookingRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
+import locationRoutes from "./routes/locationRoutes.js";
+
+dotenv.config();
+connectDB();
 
 const app = express();
-
-// Middlewares
 app.use(cors());
 app.use(express.json());
 
-// Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/worker", workerRoutes);
+app.use("/api/booking", bookingRoutes);
+app.use("/api/review", reviewRoutes);
+app.use("/api/location", locationRoutes);
 
-// MongoDB connection
-mongoose
-  .connect("mongodb://127.0.0.1:27017/makeconnect")
-  .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.log("Mongo Error", err));
-
-// Start server
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
-});
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Backend running on PORT ${PORT}`));

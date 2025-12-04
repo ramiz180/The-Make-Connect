@@ -1,15 +1,35 @@
-const User = require('../models/User');
+import User from "../models/User.js";
 
-exports.updateLocation = async (req, res) => {
-    const { userId, location, serviceRadius } = req.body;
-    try {
-        const user = await User.findByIdAndUpdate(
-            userId,
-            { location, serviceRadius },
-            { new: true }
-        );
-        res.status(200).json({ success: true, user });
-    } catch (err) {
-        res.status(500).json({ success: false, error: err.message });
-    }
+export const updateUserDetails = async (req, res) => {
+  try {
+    const { userId, name, role } = req.body;
+
+    const updated = await User.findByIdAndUpdate(
+      userId,
+      { name, role },
+      { new: true }
+    );
+
+    res.json({ success: true, user: updated });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const saveLocation = async (req, res) => {
+  try {
+    const { userId, latitude, longitude, address } = req.body;
+
+    const updated = await User.findByIdAndUpdate(
+      userId,
+      {
+        location: { latitude, longitude, address },
+      },
+      { new: true }
+    );
+
+    res.json({ success: true, user: updated });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
