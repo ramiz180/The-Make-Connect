@@ -1,134 +1,287 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  TextInput,
+  FlatList,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
 export default function CustomerHome({ navigation }) {
+  // ⭐ UPDATED CATEGORY ARRAY WITH URL IMAGES ONLY
+  const categories = [
+    { 
+      id: 1, 
+      title: "Beauty Service", 
+      image: { uri: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9" }
+    },
+    { 
+      id: 2, 
+      title: "Plumbing", 
+      image: { uri: "https://images.unsplash.com/photo-1581092919535-3346a1be7dee" }
+    },
+    { 
+      id: 3, 
+      title: "Electrical", 
+      image: { uri: "https://images.unsplash.com/photo-1581093448798-5fe5e3d8a5c1" }
+    },
+    { 
+      id: 4, 
+      title: "Home Cleaning", 
+      image: { uri: "https://images.unsplash.com/photo-1581579188871-4b4b50c1d4e6" }
+    },
+    { 
+      id: 5, 
+      title: "Handyman", 
+      image: { uri: "https://images.unsplash.com/photo-1597004891215-3f23c5f6b25f" }
+    },
+    { 
+      id: 6, 
+      title: "Tutoring", 
+      image: { uri: "https://images.unsplash.com/photo-1588075592390-4816b9bd7c1f" }
+    }
+  ];
+
+  const workers = [
+    {
+      id: 1,
+      name: "Rahul Sharma",
+      image: { uri: "https://randomuser.me/api/portraits/men/75.jpg" },
+      rating: 4.8,
+      distance: "1.2 km away",
+      jobs: 25,
+    },
+    {
+      id: 2,
+      name: "Anita Verma",
+      image: { uri: "https://randomuser.me/api/portraits/women/65.jpg" },
+      rating: 4.9,
+      distance: "2.5 km away",
+      jobs: 40,
+    },
+  ];
+
   return (
-    <ScrollView style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <ScrollView showsVerticalScrollIndicator={false}>
 
-      {/* Search Bar */}
-      <View style={styles.searchBox}>
-        <TextInput
-          placeholder="Search workers, services..."
-          placeholderTextColor="#888"
-          style={styles.searchInput}
-        />
-      </View>
-
-      {/* Categories */}
-      <Text style={styles.sectionTitle}>Categories</Text>
-      <View style={styles.categoryGrid}>
-        {[
-          "Electrician",
-          "Plumber",
-          "Painter",
-          "Carpenter",
-          "Beauty",
-          "Appliance Repair"
-        ].map((cat, index) => (
-          <TouchableOpacity key={index} style={styles.categoryCard}>
-            <Image
-              source={require("../../assets/icons/category.png")}
-              style={styles.categoryIcon}
-            />
-
-
-            <Text style={styles.categoryText}>{cat}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Quick Filters */}
-      <Text style={styles.sectionTitle}>Quick Filters</Text>
-      <View style={styles.filterRow}>
-        {["Nearby", "Low Price", "Verified", "Top Rated"].map((item, idx) => (
-          <TouchableOpacity key={idx} style={styles.filterChip}>
-            <Text style={styles.filterText}>{item}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Nearby Workers */}
-      <Text style={styles.sectionTitle}>Nearby Workers</Text>
-
-      <View style={styles.workerCard}>
-        <Image
-          source={require("../../assets/images/user.png")}
-          style={styles.workerImg}
-        />
-        <View style={styles.workerInfo}>
-          <Text style={styles.workerName}>Rahul Sharma</Text>
-          <Text style={styles.workerSkill}>Electrician • 3 yrs exp</Text>
-          <Text style={styles.workerDistance}>1.2 km away</Text>
+        {/* Header */}
+        <View style={styles.headerRow}>
+          <Text style={styles.brand}>The Make Connect</Text>
+          <Ionicons name="notifications-outline" size={22} color="#fff" />
         </View>
-      </View>
 
-      <View style={styles.workerCard}>
-        <Image
-          source={require("../../assets/images/user.png")}
-          style={styles.workerImg}
-        />
-        <View style={styles.workerInfo}>
-          <Text style={styles.workerName}>Amit Kumar</Text>
-          <Text style={styles.workerSkill}>Plumber • 5 yrs exp</Text>
-          <Text style={styles.workerDistance}>2.1 km away</Text>
+        {/* Greeting */}
+        <Text style={styles.hello}>Hello, Jane!</Text>
+
+        {/* Search Input */}
+        <View style={styles.searchBar}>
+          <Ionicons name="search" size={20} color="#A8B0BA" />
+          <TextInput
+            placeholder="Search for a service or worker..."
+            placeholderTextColor="#A8B0BA"
+            style={styles.searchInput}
+          />
+          <MaterialIcons name="tune" size={20} color="#00D786" />
         </View>
-      </View>
 
-    </ScrollView>
+        {/* Categories Section */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Services</Text>
+        </View>
+
+        <View style={styles.grid}>
+          {categories.map((cat) => (
+            <TouchableOpacity
+              key={cat.id}
+              style={styles.card}
+              onPress={() => navigation.navigate("WorkerList", { category: cat })}
+            >
+              <Image source={cat.image} style={styles.cardImage} />
+              <Text style={styles.cardTitle}>{cat.title}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Nearby Workers */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Nearby Workers</Text>
+        </View>
+
+        <FlatList
+          data={workers}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={{ paddingRight: 20 }}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.workerCard}
+              onPress={() =>
+                navigation.navigate("WorkerProfile", { worker: item })
+              }
+            >
+              <Image source={item.image} style={styles.workerImage} />
+              <Text style={styles.workerName}>{item.name}</Text>
+
+              <View style={styles.rowCenter}>
+                <Ionicons name="star" size={14} color="#FFD700" />
+                <Text style={styles.rating}>{item.rating}</Text>
+              </View>
+
+              <Text style={styles.distance}>{item.distance}</Text>
+
+              <Text style={styles.jobs}>{item.jobs} Jobs Done</Text>
+
+              <View style={styles.tagRow}>
+                <Text style={styles.tag}>Top Rated</Text>
+                <Text style={styles.tag}>Available Now</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
+// -------------------- STYLES --------------------
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: 16 },
-
-  searchBox: {
-    backgroundColor: "#f1f1f1",
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginBottom: 20,
+  container: {
+    flex: 1,
+    backgroundColor: "#0B0F15",
+    paddingHorizontal: 16,
   },
-  searchInput: { fontSize: 16, color: "#000" },
 
-  sectionTitle: { fontSize: 18, fontWeight: "700", marginVertical: 12 },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 10,
+  },
+  brand: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "700",
+  },
 
-  categoryGrid: {
+  hello: {
+    color: "#fff",
+    fontSize: 22,
+    marginTop: 10,
+    fontWeight: "700",
+  },
+
+  searchBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#121820",
+    padding: 12,
+    borderRadius: 12,
+    marginTop: 14,
+    borderWidth: 1,
+    borderColor: "#1E2630",
+  },
+  searchInput: {
+    flex: 1,
+    marginLeft: 10,
+    fontSize: 14,
+    color: "#fff",
+  },
+
+  sectionHeader: {
+    marginTop: 20,
+  },
+  sectionTitle: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "700",
+  },
+
+  grid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
+    marginTop: 10,
   },
-  categoryCard: {
-    width: "31%",
-    backgroundColor: "#f9f9f9",
-    padding: 14,
+  card: {
+    width: "48%",
+    backgroundColor: "#121820",
     borderRadius: 14,
-    alignItems: "center",
-    marginBottom: 12,
+    marginBottom: 16,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#1E2630",
   },
-  categoryIcon: { width: 40, height: 40, marginBottom: 8 },
-  categoryText: { fontSize: 14, fontWeight: "600" },
-
-  filterRow: { flexDirection: "row", marginBottom: 10 },
-  filterChip: {
-    backgroundColor: "#e7f3ff",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    marginRight: 10,
+  cardImage: {
+    width: "100%",
+    height: 110,
   },
-  filterText: { color: "#007bff" },
+  cardTitle: {
+    color: "#fff",
+    padding: 10,
+    fontSize: 14,
+    fontWeight: "600",
+  },
 
   workerCard: {
+    width: 160,
+    backgroundColor: "#121820",
+    borderRadius: 14,
+    padding: 12,
+    marginRight: 12,
+    borderWidth: 1,
+    borderColor: "#1E2630",
+  },
+  workerImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginBottom: 10,
+  },
+  workerName: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  rowCenter: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f8f8f8",
-    padding: 14,
-    borderRadius: 14,
-    marginBottom: 12,
+    marginTop: 4,
   },
-  workerImg: { width: 50, height: 50, borderRadius: 25, marginRight: 12 },
-  workerInfo: { flex: 1 },
-  workerName: { fontSize: 16, fontWeight: "700" },
-  workerSkill: { color: "#555" },
-  workerDistance: { marginTop: 4, color: "#007bff", fontWeight: "600" },
+  rating: {
+    color: "#fff",
+    marginLeft: 4,
+  },
+  distance: {
+    color: "#A8B0BA",
+    marginTop: 3,
+    fontSize: 12,
+  },
+  jobs: {
+    color: "#A8B0BA",
+    fontSize: 12,
+    marginTop: 3,
+    marginBottom: 6,
+  },
+  tagRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 4,
+  },
+  tag: {
+    backgroundColor: "#00D786",
+    color: "#000",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    fontSize: 10,
+    fontWeight: "700",
+  },
 });
+

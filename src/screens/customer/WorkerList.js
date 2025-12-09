@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function WorkerList({ navigation }) {
   const [sortBy, setSortBy] = useState("nearby");
@@ -7,85 +14,113 @@ export default function WorkerList({ navigation }) {
   const workers = [
     {
       id: 1,
-      name: "Rahul Sharma",
-      skill: "Electrician",
-      exp: "3 yrs",
-      distance: "1.2 km",
-      price: "₹150",
-      rating: 4.7,
+      name: "Alex Johnson",
+      skill: "Master Plumber",
+      distance: "1.3 km away",
+      rating: 4.9,
+      avatarColor: "#4A90E2",
     },
     {
       id: 2,
-      name: "Amit Verma",
-      skill: "Plumber",
-      exp: "5 yrs",
-      distance: "2.3 km",
-      price: "₹200",
-      rating: 4.5,
+      name: "Michael Lee",
+      skill: "Residential Plumber",
+      distance: "1.8 km away",
+      rating: 4.8,
+      avatarColor: "#50E3C2",
+    },
+    {
+      id: 3,
+      name: "Samantha Bee",
+      skill: "Commercial Plumber",
+      distance: "2.1 km away",
+      rating: 4.7,
+      avatarColor: "#F5A623",
     },
   ];
 
   return (
     <View style={styles.container}>
-
-      {/* Header */}
-      <Text style={styles.title}>Nearby Workers</Text>
-
-      {/* Sort Buttons */}
-      <View style={styles.sortRow}>
-        {["Nearby", "Price", "Rating"].map((item) => (
-          <TouchableOpacity
-            key={item}
-            onPress={() => setSortBy(item.toLowerCase())}
-            style={[
-              styles.sortBtn,
-              sortBy === item.toLowerCase() && styles.sortBtnActive
-            ]}
-          >
-            <Text
-              style={[
-                styles.sortText,
-                sortBy === item.toLowerCase() && styles.sortTextActive
-              ]}
-            >
-              {item}
-            </Text>
-          </TouchableOpacity>
-        ))}
+      {/* Top header */}
+      <View style={styles.headerRow}>
+        <Ionicons
+          name="chevron-back"
+          size={26}
+          color="#fff"
+          onPress={() => navigation.goBack()}
+        />
+        <Text style={styles.headerTitle}>Plumbers</Text>
+        <Ionicons name="search" size={22} color="#fff" />
       </View>
 
-      {/* Worker List */}
+      {/* Filters */}
+      <View style={styles.filterRow}>
+        <TouchableOpacity style={styles.filterBtn}>
+          <Ionicons name="filter" size={14} color="#fff" />
+          <Text style={styles.filterText}>Filter</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.filterBtn}>
+          <Text style={styles.filterText}>Price</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.filterBtn}>
+          <Text style={styles.filterText}>Rating</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.filterBtn, styles.activeFilter]}>
+          <Text style={styles.activeFilterText}>Nearby</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Workers List */}
       <FlatList
         data={workers}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.workerCard}
-            onPress={() => navigation.navigate("WorkerProfile", { worker: item })}
-          >
-            <Image
-              source={require("../../assets/images/user.png")}
-              style={styles.workerImg}
-            />
+          <View style={styles.card}>
+            <View style={{ flexDirection: "row" }}>
+              {/* Avatar Placeholder */}
+              <View
+                style={[
+                  styles.avatar,
+                  { backgroundColor: item.avatarColor || "#555" },
+                ]}
+              >
+                <Ionicons name="person" size={28} color="#fff" />
+              </View>
 
-
-
-            <View style={{ flex: 1 }}>
-              <Text style={styles.workerName}>{item.name}</Text>
-              <Text style={styles.workerSkill}>
-                {item.skill} • {item.exp}
-              </Text>
-
-              <View style={styles.rowBetween}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.name}>{item.name}</Text>
+                <Text style={styles.skill}>{item.skill}</Text>
                 <Text style={styles.distance}>{item.distance}</Text>
-                <Text style={styles.price}>{item.price}</Text>
+              </View>
+
+              <View style={styles.ratingBox}>
+                <Ionicons name="star" size={14} color="#fff" />
+                <Text style={styles.rating}>{item.rating}</Text>
               </View>
             </View>
 
-            <View style={styles.ratingBadge}>
-              <Text style={styles.ratingText}>{item.rating}</Text>
+            {/* Buttons */}
+            <View style={styles.btnRow}>
+              <TouchableOpacity
+                style={styles.bookBtn}
+                onPress={() =>
+                  navigation.navigate("WorkerProfile", { worker: item })
+                }
+              >
+                <Text style={styles.bookText}>Book</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.chatBtn}
+                onPress={() => navigation.navigate("Messages")}
+              >
+                <Text style={styles.chatText}>Chat</Text>
+              </TouchableOpacity>
+
             </View>
-          </TouchableOpacity>
+          </View>
         )}
       />
     </View>
@@ -93,47 +128,136 @@ export default function WorkerList({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: 16 },
+  container: {
+    flex: 1,
+    backgroundColor: "#0D0D0D",
+    paddingHorizontal: 16,
+  },
 
-  title: { fontSize: 20, fontWeight: "700", marginBottom: 16 },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 45,
+    marginBottom: 20,
+    justifyContent: "space-between",
+  },
 
-  sortRow: { flexDirection: "row", marginBottom: 16 },
-  sortBtn: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    backgroundColor: "#eee",
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#fff",
+  },
+
+  filterRow: {
+    flexDirection: "row",
+    marginBottom: 15,
+  },
+
+  filterBtn: {
+    flexDirection: "row",
+    alignItems: "center",
     borderRadius: 20,
+    backgroundColor: "#2A2A2A",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     marginRight: 10,
   },
-  sortBtnActive: { backgroundColor: "#007bff" },
-  sortText: { color: "#333", fontSize: 14 },
-  sortTextActive: { color: "#fff" },
 
-  workerCard: {
-    flexDirection: "row",
-    padding: 14,
-    backgroundColor: "#f8f8f8",
-    borderRadius: 14,
-    marginBottom: 14,
-    alignItems: "center",
+  filterText: {
+    color: "#fff",
+    fontSize: 13,
+    marginLeft: 3,
   },
 
-  workerImg: { width: 55, height: 55, borderRadius: 27 },
+  activeFilter: {
+    backgroundColor: "#0DE47F",
+  },
 
-  workerName: { fontSize: 16, fontWeight: "700" },
-  workerSkill: { color: "#777" },
+  activeFilterText: {
+    color: "#000",
+    fontWeight: "700",
+    fontSize: 13,
+  },
 
-  rowBetween: { flexDirection: "row", justifyContent: "space-between" },
+  card: {
+    backgroundColor: "#1A1A1A",
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 16,
+  },
 
-  distance: { color: "#007bff", marginTop: 6 },
-  price: { fontWeight: "700", marginTop: 6 },
+  avatar: {
+    width: 55,
+    height: 55,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
 
-  ratingBadge: {
-    backgroundColor: "#4CAF50",
+  name: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#fff",
+  },
+
+  skill: {
+    color: "#B5B5B5",
+    marginTop: 2,
+  },
+
+  distance: {
+    color: "#0DE47F",
+    marginTop: 4,
+    fontWeight: "600",
+  },
+
+  ratingBox: {
+    flexDirection: "row",
+    backgroundColor: "#333",
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 10,
-    marginLeft: 10,
+    height: 24,
+    alignItems: "center",
   },
-  ratingText: { color: "#fff", fontWeight: "700" },
+
+  rating: {
+    color: "#fff",
+    marginLeft: 4,
+    fontSize: 13,
+    fontWeight: "700",
+  },
+
+  btnRow: {
+    flexDirection: "row",
+    marginTop: 15,
+    justifyContent: "space-between",
+  },
+
+  bookBtn: {
+    backgroundColor: "#0DE47F",
+    paddingVertical: 8,
+    paddingHorizontal: 40,
+    borderRadius: 14,
+  },
+
+  bookText: {
+    color: "#000",
+    fontWeight: "700",
+    fontSize: 14,
+  },
+
+  chatBtn: {
+    backgroundColor: "#333",
+    paddingVertical: 8,
+    paddingHorizontal: 40,
+    borderRadius: 14,
+  },
+
+  chatText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "600",
+  },
 });

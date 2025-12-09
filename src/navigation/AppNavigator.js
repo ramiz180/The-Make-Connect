@@ -19,6 +19,13 @@ import WorkerList from "../screens/customer/WorkerList";
 import WorkerProfile from "../screens/customer/WorkerProfile";
 import ChatScreen from "../screens/customer/ChatScreen";
 import RateReviewScreen from "../screens/customer/RateReviewScreen";
+import BookingScreen from "../screens/customer/BookingScreen";  // ✅ Added
+import OrderSummaryScreen from "../screens/customer/OrderSummaryScreen";
+import PaymentScreen from "../screens/customer/PaymentScreen";
+import OrderSuccess from "../screens/customer/OrderSuccess";
+import MessagesScreen from "../screens/customer/MessagesScreen";
+
+
 
 // Worker Setup Navigator
 import WorkerSetupNavigator from "./WorkerSetupNavigator";
@@ -53,6 +60,15 @@ export default function AppNavigator() {
         <Stack.Screen name="WorkerProfile" component={WorkerProfile} />
         <Stack.Screen name="CustomerChat" component={ChatScreen} />
         <Stack.Screen name="RateReview" component={RateReviewScreen} />
+        <Stack.Screen name="BookingScreen" component={BookingScreen} />
+        <Stack.Screen name="OrderSummary" component={OrderSummaryScreen} />
+        <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
+
+        <Stack.Screen name="OrderSuccess" component={OrderSuccess} />
+        <Stack.Screen name="Messages" component={MessagesScreen} />
+
+
+
 
         {/* WORKER SETUP */}
         <Stack.Screen name="WorkerSetup" component={WorkerSetupNavigator} />
