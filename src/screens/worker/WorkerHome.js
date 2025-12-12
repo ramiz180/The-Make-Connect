@@ -1,174 +1,197 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Switch,
-} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
 export default function WorkerHome({ navigation }) {
-  const [isAvailable, setIsAvailable] = useState(true);
+  const [status, setStatus] = useState("available");
+  const isAvailable = status === "available";
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Worker Dashboard</Text>
+      <View style={styles.content}>
+        <View style={styles.header}>
+          <Text style={styles.brandText}>The Make Connect</Text>
+          <TouchableOpacity
+            style={styles.addServiceButton}
+            onPress={() => navigation.navigate("AddService")}
+          >
+            <Text style={styles.addServiceText}>+ Add Service</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.centerContent}>
+          <Text style={styles.statusLabel}>Set your status</Text>
+
+          <View style={styles.toggleContainer}>
+            <TouchableOpacity
+              style={[styles.toggleOption, isAvailable && styles.toggleOptionActive]}
+              onPress={() => setStatus("available")}
+            >
+              <Text
+                style={[styles.toggleText, isAvailable && styles.toggleTextActive]}
+              >
+                Available
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.toggleOption, !isAvailable && styles.toggleOptionActive]}
+              onPress={() => setStatus("unavailable")}
+            >
+              <Text
+                style={[styles.toggleText, !isAvailable && styles.toggleTextActive]}
+              >
+                Unavailable
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.footerNav}>
+          <TouchableOpacity style={styles.navItem}>
+            <Text style={[styles.navIcon, styles.navIconActive]}>🏠</Text>
+            <Text style={[styles.navLabel, styles.navLabelActive]}>Home</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.navItem}
+            onPress={() => navigation.navigate("MyServices")}
+          >
+            <Text style={styles.navIcon}>🛠️</Text>
+            <Text style={styles.navLabel}>Services</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.navItem}
+            onPress={() => navigation.navigate("WorkerChatList")}
+          >
+            <Text style={styles.navIcon}>💬</Text>
+            <Text style={styles.navLabel}>Chat</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.navItem}
+            onPress={() => navigation.navigate("WorkerBookingScreen")}
+          >
+            <Text style={styles.navIcon}>📅</Text>
+            <Text style={styles.navLabel}>Bookings</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.navItem}
+            onPress={() => navigation.navigate("WorkerProfile")}
+          >
+            <Text style={styles.navIcon}>👤</Text>
+            <Text style={styles.navLabel}>Profile</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-
-      {/* Verification Card */}
-      <View style={styles.verificationCard}>
-        <Text style={styles.statusTitle}>Verification Status</Text>
-        <Text style={styles.statusBadge}>Pending Review</Text>
-      </View>
-
-      {/* Availability Toggle */}
-      <View style={styles.availabilityBox}>
-        <Text style={styles.availabilityText}>I am Available</Text>
-        <Switch value={isAvailable} onValueChange={setIsAvailable} />
-      </View>
-
-      {/* Quick Actions */}
-      <View style={styles.actionsRow}>
-        <TouchableOpacity
-          style={styles.actionBtn}
-          onPress={() => navigation.navigate("WorkerChatScreen")}
-        >
-          <Text style={styles.actionText}>Inbox</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.actionBtn}
-          onPress={() => navigation.navigate("EditWorkerProfile")}
-        >
-          <Text style={styles.actionText}>Edit Profile</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Radius Info */}
-      <View style={styles.radiusBox}>
-        <Text style={styles.radiusTitle}>Work Radius</Text>
-        <Text style={styles.radiusValue}>5 km</Text>
-      </View>
-
-      {/* View Verification Details */}
-      <TouchableOpacity
-        style={styles.verifyBtn}
-        onPress={() => navigation.navigate("VerificationStatus")}
-      >
-        <Text style={styles.verifyText}>View Verification Details</Text>
-      </TouchableOpacity>
     </View>
   );
 }
 
+const PRIMARY = "#31FE83";
+const BACKGROUND_DARK = "#000000";
+const TEXT_LIGHT = "#FFFFFF";
+const TEXT_MUTED_DARK = "#A0B3A0";
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    padding: 15,
+    backgroundColor: BACKGROUND_DARK,
   },
-
-  header: {
-    paddingVertical: 15,
-    alignItems: "center",
-    backgroundColor: "#0A84FF",
-    borderRadius: 10,
-    marginBottom: 20,
-  },
-
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#fff",
-  },
-
-  verificationCard: {
-    backgroundColor: "#F6F6F6",
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 20,
-  },
-
-  statusTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-
-  statusBadge: {
-    marginTop: 8,
-    backgroundColor: "#FFD700",
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    alignSelf: "flex-start",
-    fontWeight: "600",
-  },
-
-  availabilityBox: {
-    flexDirection: "row",
+  content: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 24,
     justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#F6F6F6",
-    padding: 15,
-    borderRadius: 10,
   },
-
-  availabilityText: {
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 24,
+  },
+  brandText: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: TEXT_LIGHT,
+  },
+  addServiceButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: PRIMARY,
+    borderRadius: 999,
+  },
+  addServiceText: {
+    color: BACKGROUND_DARK,
+    fontWeight: "700",
+    fontSize: 14,
+  },
+  centerContent: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  statusLabel: {
     fontSize: 16,
+    color: TEXT_MUTED_DARK,
+    marginBottom: 16,
+  },
+  toggleContainer: {
+    flexDirection: "row",
+    backgroundColor: "#111111",
+    borderRadius: 999,
+    padding: 4,
+  },
+  toggleOption: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 10,
+    borderRadius: 999,
+  },
+  toggleOptionActive: {
+    backgroundColor: PRIMARY,
+  },
+  toggleText: {
+    fontSize: 16,
+    color: TEXT_MUTED_DARK,
     fontWeight: "500",
   },
-
-  actionsRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 20,
-  },
-
-  actionBtn: {
-    backgroundColor: "#0A84FF",
-    width: "48%",
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-
-  actionText: {
-    color: "#fff",
-    fontSize: 15,
-    fontWeight: "600",
-  },
-
-  radiusBox: {
-    marginTop: 25,
-    backgroundColor: "#EAEAEA",
-    padding: 15,
-    borderRadius: 10,
-  },
-
-  radiusTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-
-  radiusValue: {
-    fontSize: 18,
+  toggleTextActive: {
+    color: BACKGROUND_DARK,
     fontWeight: "700",
-    marginTop: 5,
   },
-
-  verifyBtn: {
-    marginTop: 25,
-    backgroundColor: "#FFA500",
-    paddingVertical: 12,
-    borderRadius: 10,
+  footerNav: {
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-around",
+    backgroundColor: "#111111",
+    borderRadius: 999,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
   },
-
-  verifyText: {
-    color: "#fff",
-    fontSize: 15,
-    fontWeight: "600",
+  navItem: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  navIcon: {
+    fontSize: 18,
+    color: TEXT_MUTED_DARK,
+    marginBottom: 2,
+  },
+  navIconActive: {
+    color: PRIMARY,
+  },
+  navLabel: {
+    fontSize: 10,
+    color: TEXT_MUTED_DARK,
+  },
+  navLabelActive: {
+    color: PRIMARY,
+    fontWeight: "700",
   },
 });

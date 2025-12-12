@@ -21,8 +21,9 @@ export default function RoleSelectionScreen({ navigation, route }) {
     if (!selected) return;
 
     if (selected === "CUSTOMER") {
-      navigation.navigate("CustomerSetLocation", {
-        nextScreen: "CustomerTabs",  // ✅ Changed to CustomerTabs
+      navigation.navigate("EnterName", {
+        nextScreen: "CustomerSetLocation",
+        finalNextScreen: "CustomerHome",
         userId: fakeUserId,
         phone,
         name,

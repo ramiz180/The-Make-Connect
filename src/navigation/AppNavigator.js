@@ -10,22 +10,14 @@ import RoleSelectionScreen from "../screens/Common/RoleSelectionScreen";
 
 
 // Location
+import EnterNameScreen from "../screens/customer/EnterNameScreen";
 import CustomerSetLocationScreen from "../screens/customer/CustomerSetLocationScreen";
 import WorkerSetLocationScreen from "../screens/worker/WorkerSetLocationScreen";
 
-// Customer Screens + Tabs
-import CustomerTabs from "./CustomerTabs";
+// Customer Screens
+import CustomerHome from "../screens/customer/CustomerHome";
 import WorkerList from "../screens/customer/WorkerList";
-import WorkerProfile from "../screens/customer/WorkerProfile";
-import ChatScreen from "../screens/customer/ChatScreen";
-import RateReviewScreen from "../screens/customer/RateReviewScreen";
-import BookingScreen from "../screens/customer/BookingScreen";  // ✅ Added
-import OrderSummaryScreen from "../screens/customer/OrderSummaryScreen";
-import PaymentScreen from "../screens/customer/PaymentScreen";
-import OrderSuccess from "../screens/customer/OrderSuccess";
-import MessagesScreen from "../screens/customer/MessagesScreen";
-
-
+import CustomerBookingConfirm from "../screens/customer/CustomerBookingConfirm";
 
 // Worker Setup Navigator
 import WorkerSetupNavigator from "./WorkerSetupNavigator";
@@ -33,8 +25,14 @@ import WorkerSetupNavigator from "./WorkerSetupNavigator";
 // Worker Screens
 import WorkerHome from "../screens/worker/WorkerHome";
 import WorkerChatScreen from "../screens/worker/WorkerChatScreen";
-import EditWorkerProfile from "../screens/worker/EditWorkerProfile";
+
 import VerificationStatus from "../screens/worker/VerificationStatus";
+import AddService from "../screens/worker/AddService";
+import MyServices from "../screens/worker/MyServices";
+import WorkerBookingScreen from "../screens/worker/BookingScreen";
+import WorkerChatList from "../screens/worker/ChatScreen";
+import WorkerProfile from "../screens/worker/WorkerProfile";
+import EditWorkerProfile from "../screens/worker/EditWorkerProfile";
 
 const Stack = createNativeStackNavigator();
 
@@ -51,34 +49,30 @@ export default function AppNavigator() {
         <Stack.Screen name="RoleSelection" component={RoleSelectionScreen} />
 
         {/* LOCATION */}
+        <Stack.Screen name="EnterName" component={EnterNameScreen} />
         <Stack.Screen name="CustomerSetLocation" component={CustomerSetLocationScreen} />
         <Stack.Screen name="WorkerSetLocationScreen" component={WorkerSetLocationScreen} />
 
         {/* CUSTOMER */}
-        <Stack.Screen name="CustomerTabs" component={CustomerTabs} />
+        <Stack.Screen name="CustomerHome" component={CustomerHome} />
         <Stack.Screen name="WorkerList" component={WorkerList} />
-        <Stack.Screen name="WorkerProfile" component={WorkerProfile} />
-        <Stack.Screen name="CustomerChat" component={ChatScreen} />
-        <Stack.Screen name="RateReview" component={RateReviewScreen} />
-        <Stack.Screen name="BookingScreen" component={BookingScreen} />
-        <Stack.Screen name="OrderSummary" component={OrderSummaryScreen} />
-        <Stack.Screen name="PaymentScreen" component={PaymentScreen} />
-
-        <Stack.Screen name="OrderSuccess" component={OrderSuccess} />
-        <Stack.Screen name="Messages" component={MessagesScreen} />
-
-
-
+        <Stack.Screen name="CustomerBookingConfirm" component={CustomerBookingConfirm} />
 
         {/* WORKER SETUP */}
         <Stack.Screen name="WorkerSetup" component={WorkerSetupNavigator} />
 
         {/* WORKER */}
         <Stack.Screen name="WorkerHome" component={WorkerHome} />
-        <Stack.Screen name="WorkerChat" component={WorkerChatScreen} />
+        <Stack.Screen name="WorkerChatScreen" component={WorkerChatScreen} />
+        <Stack.Screen name="WorkerChatList" component={WorkerChatList} />
+        <Stack.Screen name="WorkerProfile" component={WorkerProfile} />
         <Stack.Screen name="EditWorkerProfile" component={EditWorkerProfile} />
-        <Stack.Screen name="VerificationStatus" component={VerificationStatus} />
 
+        <Stack.Screen name="VerificationStatus" component={VerificationStatus} />
+        <Stack.Screen name="AddService" component={AddService} />
+        <Stack.Screen name="MyServices" component={MyServices} />
+        <Stack.Screen name="WorkerBookingScreen" component={WorkerBookingScreen} />
+       
       </Stack.Navigator>
     </NavigationContainer>
   );
