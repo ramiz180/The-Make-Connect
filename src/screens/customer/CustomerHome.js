@@ -105,7 +105,13 @@ export default function CustomerHome({ navigation }) {
         </View>
 
         {/* Greeting */}
-        <Text style={styles.hello}>Hello, Jane!</Text>
+        <View style={styles.greetingContainer}>
+          <Text style={styles.hello}>Hello, Jane!</Text>
+          <View style={styles.locationContainer}>
+            <MaterialIcons name="location-on" size={16} color="#00FF85" />
+            <Text style={styles.locationText}>Mission District, San Francisco</Text>
+          </View>
+        </View>
 
         {/* Search Bar */}
         <View style={styles.searchBar}>
@@ -235,11 +241,25 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
   },
+  greetingContainer: {
+    marginLeft: 20,
+    marginTop: 10,
+    marginBottom: 16,
+  },
   hello: {
-    color: "#fff",
-    fontSize: 26,
-    marginTop: 12,
-    fontWeight: "700",
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 4,
+  },
+  locationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  locationText: {
+    color: '#A8B0BA',
+    fontSize: 14,
+    marginLeft: 4,
   },
   searchBar: {
     flexDirection: "row",

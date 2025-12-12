@@ -7,32 +7,36 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  ImageBackground,
+  Dimensions,
+  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialIcons } from "@expo/vector-icons";
+
+const { width, height } = Dimensions.get('window');
 
 export default function EnterNameScreen({ navigation, route }) {
   const { nextScreen = "CustomerSetLocation", userId, phone } = route?.params || {};
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [fullName, setFullName] = useState("");
 
   const handleBack = () => {
     navigation.goBack();
   };
 
   const handleContinue = () => {
-    const fullName = `${firstName} ${lastName}`.trim();
-    if (!firstName.trim() || !lastName.trim()) return;
+    if (!fullName.trim()) return;
 
     navigation.navigate(nextScreen, {
       userId,
       phone,
-      name: fullName,
+      name: fullName.trim(),
       nextScreen: route?.params?.finalNextScreen,
     });
   };
 
-  const isDisabled = !firstName.trim() || !lastName.trim();
+  const isDisabled = !fullName.trim();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -40,77 +44,54 @@ export default function EnterNameScreen({ navigation, route }) {
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <View style={styles.inner}>
-          {/* Top brand + back */}
-          <View style={styles.topRow}>
-            <View style={styles.brandLeft}>
-              <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-                <Text style={styles.backArrow}>{"<"}</Text>
-              </TouchableOpacity>
-              <Text style={styles.brandText}>THE MAKE CONNECT</Text>
-            </View>
+        <View style={styles.backgroundContainer}>
+          <View style={styles.backgroundImage}>
+            <View style={styles.overlay} />
           </View>
-
-          {/* Step + progress */}
-          <View style={styles.stepBlock}>
-            <Text style={styles.stepText}>Step 2 of 4</Text>
-            <View style={styles.progressTrack}>
-              <View style={styles.progressFill} />
-            </View>
-          </View>
-
-          {/* Title + subtitle */}
-          <View style={styles.titleBlock}>
-            <Text style={styles.title}>Complete your profile</Text>
-            <Text style={styles.subtitle}>
-              This helps others identify you on the platform.
-            </Text>
-          </View>
-
-          {/* First + Last name fields */}
-          <View style={styles.formBlock}>
-            <View style={styles.inputBlock}> 
-              <Text style={styles.label}>First Name</Text>
-              <View style={styles.inputWrapper}>
-                <Text style={styles.inputIcon}>👤</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter your first name"
-                  placeholderTextColor="#555555"
-                  value={firstName}
-                  onChangeText={setFirstName}
-                  returnKeyType="next"
-                />
+          <View style={styles.glow} />
+          
+          <View style={styles.contentContainer}>
+            {/* Logo */}
+            <View style={styles.logoContainer}>
+              <View style={styles.logoCircle}>
+                <MaterialIcons name="handyman" size={32} color="#0A0A0A" />
               </View>
+              <Text style={styles.brandText}>The Make Connect</Text>
             </View>
 
-            <View style={styles.inputBlock}> 
-              <Text style={styles.label}>Last Name</Text>
-              <View style={styles.inputWrapper}>
-                <Text style={styles.inputIcon}>👤</Text>
+            {/* Main Content */}
+            <View style={styles.mainContent}>
+              <View style={styles.textContainer}>
+                <Text style={styles.title}>What is your name?</Text>
+              </View>
+              
+              <View style={styles.inputContainer}>
                 <TextInput
-                  style={styles.input}
-                  placeholder="Enter your last name"
-                  placeholderTextColor="#555555"
-                  value={lastName}
-                  onChangeText={setLastName}
+                  style={styles.inputField}
+                  placeholder="Your full name"
+                  placeholderTextColor="rgba(255, 255, 255, 0.5)"
+                  value={fullName}
+                  onChangeText={setFullName}
                   returnKeyType="done"
                   onSubmitEditing={handleContinue}
+                  autoCapitalize="words"
+                  autoCorrect={false}
                 />
               </View>
             </View>
+
+            {/* Continue Button */}
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={[styles.continueButton, isDisabled && styles.continueButtonDisabled]}
+                onPress={handleContinue}
+                disabled={isDisabled}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.continueButtonText}>Continue</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-
-          <View style={{ flex: 1 }} />
-
-          {/* Bottom continue button */}
-          <TouchableOpacity
-            style={[styles.btn, isDisabled && styles.disabled]}
-            disabled={isDisabled}
-            onPress={handleContinue}
-          >
-            <Text style={styles.btnText}>Continue</Text>
-          </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -120,7 +101,122 @@ export default function EnterNameScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0A0A0A",
+    backgroundColor: '#0A0A0A',
+  },
+  backgroundContainer: {
+    flex: 1,
+    backgroundColor: '#0A0A0A',
+  },
+  backgroundImage: {
+    ...StyleSheet.absoluteFillObject,
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#0A0A0A',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(10, 10, 10, 0.9)',
+  },
+  glow: {
+    position: 'absolute',
+    top: -height * 0.1,
+    left: '50%',
+    transform: [{ translateX: -width * 0.75 }],
+    width: width * 1.5,
+    height: height * 0.5,
+    backgroundColor: 'rgba(69, 211, 154, 0.05)',
+    borderRadius: width * 0.75,
+    borderWidth: 1,
+    borderColor: 'rgba(69, 211, 154, 0.1)',
+  },
+  contentContainer: {
+    flex: 1,
+    padding: 24,
+    justifyContent: 'space-between',
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginTop: 40,
+  },
+  logoCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 16,
+    backgroundColor: '#45D39A',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+    shadowColor: '#45D39A',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4,
+    shadowRadius: 25,
+    elevation: 5,
+  },
+  brandText: {
+    fontSize: 14,
+    fontWeight: '800',
+    letterSpacing: 2,
+    color: 'rgba(255, 255, 255, 0.9)',
+    textTransform: 'uppercase',
+  },
+  mainContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  textContainer: {
+    marginBottom: 48,
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    textAlign: 'center',
+    marginBottom: 12,
+    lineHeight: 38,
+  },
+  inputContainer: {
+    width: '100%',
+    marginBottom: 48,
+  },
+  inputField: {
+    width: '100%',
+    backgroundColor: 'transparent',
+    borderBottomWidth: 2,
+    borderBottomColor: '#2A2A2A',
+    paddingVertical: 16,
+    color: '#FFFFFF',
+    fontSize: 24,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  buttonContainer: {
+    width: '100%',
+    marginBottom: 40,
+  },
+  continueButton: {
+    width: '100%',
+    height: 56,
+    backgroundColor: '#45D39A',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#45D39A',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 20,
+    elevation: 5,
+  },
+  continueButtonDisabled: {
+    opacity: 0.6,
+  },
+  continueButtonText: {
+    color: '#0A0A0A',
+    fontSize: 18,
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
   inner: {
     flex: 1,
@@ -154,6 +250,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: 1,
   },
+  // Removed duplicate brandText style
   stepBlock: {
     marginTop: 24,
   },
@@ -176,12 +273,7 @@ const styles = StyleSheet.create({
   titleBlock: {
     marginTop: 24,
   },
-  title: {
-    color: "#E0E0E0",
-    fontSize: 26,
-    fontWeight: "700",
-    marginBottom: 8,
-  },
+  // Removed duplicate title style
   subtitle: {
     color: "#9CA3AF",
     fontSize: 14,
