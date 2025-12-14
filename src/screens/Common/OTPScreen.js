@@ -18,7 +18,8 @@ import { MaterialIcons } from '@expo/vector-icons';
 // 🔥 Firebase
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 import { PhoneAuthProvider, signInWithCredential } from 'firebase/auth';
-import { auth } from '../../config/firebase';
+import { auth, app } from '../../config/firebase';
+
 
 const OTPScreen = ({ navigation, route }) => {
     const phoneNumber = route?.params?.phoneNumber;
@@ -77,19 +78,40 @@ const OTPScreen = ({ navigation, route }) => {
 
         try {
             setLoading(true);
+
+            // 1️⃣ Firebase verifies OTP
             const credential = PhoneAuthProvider.credential(verificationId, code);
             const result = await signInWithCredential(auth, credential);
+
+            // 2️⃣ Get Firebase ID token
             const token = await result.user.getIdToken();
 
-            console.log('🔥 Firebase ID Token:', token);
-            setLoading(false);
+            // 3️⃣ Send token to backend
+            const response = await fetch('http://192.168.1.102:3000/auth/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ token }),
+            });
 
-            navigation.navigate('RoleSelection');
+            const data = await response.json();
+
+            // 4️⃣ Backend verification result
+            if (data.success) {
+                console.log('Backend verified:', data.user);
+                navigation.navigate('RoleSelection');
+            } else {
+                Alert.alert('Backend verification failed');
+            }
+
+            setLoading(false);
         } catch (e) {
             setLoading(false);
             Alert.alert('Verification Failed', e.message);
         }
     };
+
 
     const isOtpComplete = otp.every(d => d !== '');
 
@@ -102,7 +124,8 @@ const OTPScreen = ({ navigation, route }) => {
 
             <FirebaseRecaptchaVerifierModal
                 ref={recaptchaVerifier}
-                firebaseConfig={auth.app.options}
+                firebaseConfig={app.options}
+
             />
 
             <ImageBackground

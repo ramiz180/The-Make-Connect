@@ -49,7 +49,11 @@ const WelcomeScreen = ({ navigation }) => {
                                 placeholderTextColor="#a0b3a0"
                                 keyboardType="phone-pad"
                                 value={phoneNumber}
-                                onChangeText={setPhoneNumber}
+                                onChangeText={(text) => {
+                                    const digitsOnly = text.replace(/[^0-9]/g, '');
+                                    setPhoneNumber(digitsOnly);
+                                }}
+
                                 maxLength={10}
                             />
 
