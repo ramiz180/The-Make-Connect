@@ -33,6 +33,7 @@ import WorkerBookingScreen from "../screens/worker/BookingScreen";
 import WorkerChatList from "../screens/worker/ChatScreen";
 import WorkerProfile from "../screens/worker/WorkerProfile";
 import EditWorkerProfile from "../screens/worker/EditWorkerProfile";
+import WorkerEnterName from '../screens/worker/WorkerEnterNameScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -67,12 +68,16 @@ export default function AppNavigator() {
         <Stack.Screen name="WorkerChatList" component={WorkerChatList} />
         <Stack.Screen name="WorkerProfile" component={WorkerProfile} />
         <Stack.Screen name="EditWorkerProfile" component={EditWorkerProfile} />
+        <Stack.Screen
+          name="WorkerEnterName"
+          component={WorkerEnterName}
+        />
 
         <Stack.Screen name="VerificationStatus" component={VerificationStatus} />
         <Stack.Screen name="AddService" component={AddService} />
         <Stack.Screen name="MyServices" component={MyServices} />
         <Stack.Screen name="WorkerBookingScreen" component={WorkerBookingScreen} />
-       
+
       </Stack.Navigator>
     </NavigationContainer>
   );

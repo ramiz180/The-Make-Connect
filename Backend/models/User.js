@@ -1,26 +1,19 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
-    phone: { type: String, required: true, unique: true },
-    name: { type: String },
-    role: { type: String, enum: ["customer", "worker"], required: true },
-
-    // Location
-    location: {
-      latitude: Number,
-      longitude: Number,
-      address: String,
+    phone: {
+      type: String,
+      required: true,
+      unique: true,
     },
-
-    // OTP auth
-    otp: String,
-    otpExpires: Date,
-
-    // Only for worker setup completion
-    isProfileComplete: { type: Boolean, default: false }
+    role: {
+      type: String,
+      enum: ["customer", "worker"],
+      default: null,
+    },
   },
   { timestamps: true }
 );
 
-export default mongoose.model("User", userSchema);
+module.exports = mongoose.model("User", userSchema);

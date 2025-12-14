@@ -1,84 +1,117 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, StatusBar, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ImageBackground,
+  TouchableOpacity,
+  StatusBar,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
+import axios from 'axios';
+
+const BASE_URL = "http://192.168.29.199:3000";
 
 const WelcomeScreen = ({ navigation }) => {
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const isValid = phoneNumber.length === 10;
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [loading, setLoading] = useState(false);
 
-    return (
-        <KeyboardAvoidingView
-            style={styles.container}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+  const isValid = phoneNumber.length === 10;
+
+  const sendOtp = async () => {
+    try {
+      setLoading(true);
+      await axios.post(`${BASE_URL}/api/auth/send-otp`, {
+        phone: phoneNumber,
+      });
+
+      navigation.navigate('OTP', { phoneNumber });
+    } catch (err) {
+      Alert.alert("Error", "Failed to send OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <StatusBar style="light" />
+
+      <ImageBackground
+        source={{
+          uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDhZXycYdRVRHF2S0CtbL_-C7k1agplW_MYBL6GaZEIgzdsyF0bgOb8ATVdZylRUjN73S4XR-bMaZe1vwLmdsrod7PhnHMIQNXrlFkqvoXb4nkKrkQRzzIoH_Z9Sot-SNfiFgLk6ZHx_XD1MvXJs1P0ohQ9B-4VRsMqBsvL19EF-da3PkOZbvAYNQgA4ir4jWcNYbCRZ7Z4Z2ON8mOwdTNicReRHgRp0VwhqtnuaDfKe5pgt0XyB1ulCiYymQKOu1AcK8K2nlveVyM',
+        }}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      >
+        <LinearGradient
+          colors={['transparent', 'rgba(0,0,0,0.8)', '#000']}
+          style={styles.gradient}
         >
-            <StatusBar style="light" />
+          <SafeAreaView style={styles.contentContainer}>
+            <View style={styles.header}>
+              <MaterialIcons name="hub" size={32} color="#31FE83" />
+              <Text style={styles.headerText}>The Make Connect</Text>
+            </View>
 
-            {/* Background Image */}
-            <ImageBackground
-                source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDhZXycYdRVRHF2S0CtbL_-C7k1agplW_MYBL6GaZEIgzdsyF0bgOb8ATVdZylRUjN73S4XR-bMaZe1vwLmdsrod7PhnHMIQNXrlFkqvoXb4nkKrkQRzzIoH_Z9Sot-SNfiFgLk6ZHx_XD1MvXJs1P0ohQ9B-4VRsMqBsvL19EF-da3PkOZbvAYNQgA4ir4jWcNYbCRZ7Z4Z2ON8mOwdTNicReRHgRp0VwhqtnuaDfKe5pgt0XyB1ulCiYymQKOu1AcK8K2nlveVyM' }}
-                style={styles.backgroundImage}
-                resizeMode="cover"
-            >
-                {/* Gradient Overlay */}
-                <LinearGradient
-                    colors={['transparent', 'rgba(0,0,0,0.8)', '#000000']}
-                    style={styles.gradient}
-                    locations={[0, 0.6, 1]}
-                >
-                    <SafeAreaView style={styles.contentContainer}>
+            <View style={styles.mainContent}>
+              <Text style={styles.title}>
+                Find Skilled Help, Right Next Door.
+              </Text>
+            </View>
 
-                        {/* Header */}
-                        <View style={styles.header}>
-                            <MaterialIcons name="hub" size={32} color="#31FE83" />
-                            <Text style={styles.headerText}>The Make Connect</Text>
-                        </View>
+            <View style={styles.actions}>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your phone number"
+                placeholderTextColor="#a0b3a0"
+                keyboardType="phone-pad"
+                value={phoneNumber}
+                onChangeText={(text) =>
+                  setPhoneNumber(text.replace(/[^0-9]/g, ''))
+                }
+                maxLength={10}
+              />
 
-                        {/* Main Content */}
-                        <View style={styles.mainContent}>
-                            <Text style={styles.title}>Find Skilled Help, Right Next Door.</Text>
-                        </View>
+              <TouchableOpacity
+                style={[
+                  styles.primaryButton,
+                  (!isValid || loading) && styles.primaryButtonDisabled,
+                ]}
+                onPress={sendOtp}
+                disabled={!isValid || loading}
+              >
+                <Text style={styles.primaryButtonText}>
+                  {loading ? "Sending..." : "Continue"}
+                </Text>
+              </TouchableOpacity>
 
-                        {/* Actions */}
-                        <View style={styles.actions}>
-                            {/* Phone Number Input */}
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Enter your phone number"
-                                placeholderTextColor="#a0b3a0"
-                                keyboardType="phone-pad"
-                                value={phoneNumber}
-                                onChangeText={(text) => {
-                                    const digitsOnly = text.replace(/[^0-9]/g, '');
-                                    setPhoneNumber(digitsOnly);
-                                }}
-
-                                maxLength={10}
-                            />
-
-                            <TouchableOpacity
-                                style={[
-                                    styles.primaryButton,
-                                    !isValid && styles.primaryButtonDisabled,
-                                ]}
-                                onPress={() => navigation.navigate('OTP', { phoneNumber })}
-                                disabled={!isValid}
-                            >
-                                <Text style={styles.primaryButtonText}>Continue</Text>
-                            </TouchableOpacity>
-
-                            <Text style={styles.footerText}>
-                                By continuing, you agree to our <Text style={styles.linkText}>Terms of Service</Text> and <Text style={styles.linkText}>Privacy Policy</Text>.
-                            </Text>
-                        </View>
-
-                    </SafeAreaView>
-                </LinearGradient>
-            </ImageBackground>
-        </KeyboardAvoidingView>
-    );
+              <Text style={styles.footerText}>
+                By continuing, you agree to our{' '}
+                <Text style={styles.linkText}>Terms</Text> &{' '}
+                <Text style={styles.linkText}>Privacy Policy</Text>.
+              </Text>
+            </View>
+          </SafeAreaView>
+        </LinearGradient>
+      </ImageBackground>
+    </KeyboardAvoidingView>
+  );
 };
+
+export default WelcomeScreen;
+
+/* styles SAME AS YOUR FILE (unchanged) */
+
 
 const styles = StyleSheet.create({
     container: {
@@ -168,4 +201,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default WelcomeScreen;
+/*export default WelcomeScreen;*/

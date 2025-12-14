@@ -29,9 +29,9 @@ export default function RoleSelectionScreen({ navigation, route }) {
         name,
       });
     } else {
-      navigation.navigate("WorkerSetLocationScreen", {
-        nextScreen: "WorkerHome",
-
+      navigation.navigate("WorkerEnterName", {
+        nextScreen: "WorkerSetLocationScreen",
+        finalNextScreen: "WorkerHome",
         userId: fakeUserId,
         phone,
         name,
