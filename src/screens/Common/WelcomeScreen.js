@@ -16,7 +16,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
 
-const BASE_URL = "http://192.168.29.199:3000";
+//const BASE_URL = "http://10.45.106.84:3000";
+const BASE_URL = "http://10.45.106.84:3000";
+
 
 const WelcomeScreen = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState('');

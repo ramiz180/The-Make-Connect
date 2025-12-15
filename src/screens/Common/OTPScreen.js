@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
@@ -10,34 +10,40 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { MaterialIcons } from '@expo/vector-icons';
-import axios from 'axios';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialIcons } from "@expo/vector-icons";
+import axios from "axios";
 
-const BASE_URL = "http://192.168.29.199:3000";
+// ✅ USE YOUR CORRECT PC IP
+const BASE_URL = "http://10.45.106.84:3000";
 
 const OTPScreen = ({ navigation, route }) => {
   const { phoneNumber } = route.params;
   const inputRefs = useRef([]);
 
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
 
   const handleOtpChange = (value, index) => {
     if (isNaN(value)) return;
+
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
-    if (value && index < 5) inputRefs.current[index + 1]?.focus();
+
+    if (value && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
   };
 
   const handleVerify = async () => {
-    const code = otp.join('');
+    const code = otp.join("");
     if (code.length !== 6) return;
 
     try {
       setLoading(true);
+
       const res = await axios.post(
         `${BASE_URL}/api/auth/verify-otp`,
         {
@@ -47,29 +53,33 @@ const OTPScreen = ({ navigation, route }) => {
       );
 
       if (res.data.success) {
-        navigation.replace(
-          res.data.role ? 'Dashboard' : 'RoleSelection',
-          { userId: res.data.userId }
-        );
+        // ✅ ALWAYS GO TO ROLE SELECTION
+        navigation.replace("RoleSelection", {
+          userId: res.data.userId,
+          phone: phoneNumber, // 🔥 MUST PASS
+        });
       }
     } catch (err) {
-      Alert.alert("Invalid OTP");
+      console.log("OTP verify error:", err.response?.data || err.message);
+      Alert.alert("Error", "Invalid OTP");
     } finally {
       setLoading(false);
     }
   };
 
-  const isOtpComplete = otp.every(d => d !== '');
+  const isOtpComplete = otp.every((d) => d !== "");
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <StatusBar style="light" />
 
       <ImageBackground
-        source={{ uri: 'https://images.unsplash.com/photo-1521790797524-3f202c3b5325' }}
+        source={{
+          uri: "https://images.unsplash.com/photo-1521790797524-3f202c3b5325",
+        }}
         style={styles.backgroundImage}
       >
         <View style={styles.overlay} />
@@ -85,16 +95,21 @@ const OTPScreen = ({ navigation, route }) => {
 
           <View style={styles.mainContent}>
             <Text style={styles.title}>Enter Verification Code</Text>
-            <Text style={styles.subtitle}>Sent to +91{phoneNumber}</Text>
+            <Text style={styles.subtitle}>
+              Sent to +91{phoneNumber}
+            </Text>
 
             <View style={styles.otpContainer}>
               {otp.map((d, i) => (
                 <TextInput
                   key={i}
-                  ref={r => (inputRefs.current[i] = r)}
-                  style={[styles.otpInput, d && styles.otpInputFilled]}
+                  ref={(r) => (inputRefs.current[i] = r)}
+                  style={[
+                    styles.otpInput,
+                    d && styles.otpInputFilled,
+                  ]}
                   value={d}
-                  onChangeText={v => handleOtpChange(v, i)}
+                  onChangeText={(v) => handleOtpChange(v, i)}
                   keyboardType="number-pad"
                   maxLength={1}
                 />
@@ -105,13 +120,14 @@ const OTPScreen = ({ navigation, route }) => {
           <TouchableOpacity
             style={[
               styles.verifyButton,
-              (!isOtpComplete || loading) && styles.verifyButtonDisabled,
+              (!isOtpComplete || loading) &&
+                styles.verifyButtonDisabled,
             ]}
             onPress={handleVerify}
             disabled={!isOtpComplete || loading}
           >
             <Text style={styles.verifyButtonText}>
-              {loading ? 'Verifying...' : 'Verify'}
+              {loading ? "Verifying..." : "Verify"}
             </Text>
           </TouchableOpacity>
         </SafeAreaView>
@@ -126,37 +142,37 @@ export default OTPScreen;
 
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#000' },
-    backgroundImage: { flex: 1 },
-    overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.6)' },
-    contentContainer: { flex: 1, padding: 16 },
-    header: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 },
-    headerText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-    mainContent: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    title: { color: '#fff', fontSize: 24, fontWeight: 'bold' },
-    subtitle: { color: '#aaa', marginTop: 8 },
-    otpContainer: { flexDirection: 'row', gap: 12, marginTop: 24 },
-    otpInput: {
-        width: 48,
-        height: 56,
-        borderWidth: 2,
-        borderColor: '#555',
-        borderRadius: 10,
-        color: '#fff',
-        fontSize: 20,
-        textAlign: 'center',
-    },
-    otpInputFilled: { borderColor: '#30E0A1' },
-    verifyButton: {
-        backgroundColor: '#30E0A1',
-        height: 56,
-        borderRadius: 12,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 24,
-    },
-    verifyButtonDisabled: { opacity: 0.5 },
-    verifyButtonText: { fontSize: 16, fontWeight: 'bold', color: '#000' },
+  container: { flex: 1, backgroundColor: '#000' },
+  backgroundImage: { flex: 1 },
+  overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.6)' },
+  contentContainer: { flex: 1, padding: 16 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 },
+  headerText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+  mainContent: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  title: { color: '#fff', fontSize: 24, fontWeight: 'bold' },
+  subtitle: { color: '#aaa', marginTop: 8 },
+  otpContainer: { flexDirection: 'row', gap: 12, marginTop: 24 },
+  otpInput: {
+    width: 48,
+    height: 56,
+    borderWidth: 2,
+    borderColor: '#555',
+    borderRadius: 10,
+    color: '#fff',
+    fontSize: 20,
+    textAlign: 'center',
+  },
+  otpInputFilled: { borderColor: '#30E0A1' },
+  verifyButton: {
+    backgroundColor: '#30E0A1',
+    height: 56,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  verifyButtonDisabled: { opacity: 0.5 },
+  verifyButtonText: { fontSize: 16, fontWeight: 'bold', color: '#000' },
 });
 
 

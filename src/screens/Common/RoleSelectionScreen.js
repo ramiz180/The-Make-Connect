@@ -7,35 +7,58 @@ import {
   StyleSheet,
   ScrollView,
   Dimensions,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
+import axios from "axios";
+
+//const BASE_URL = "http://10.45.106.84:3000"; // 🔴 change to your PC IP
+const BASE_URL = "http://10.45.106.84:3000";
+
 
 export default function RoleSelectionScreen({ navigation, route }) {
-  const fakeUserId = "1234567890";
-  const { phone, name } = route.params || {};
+  const { userId, phone, name } = route.params || {};
 
   const [selected, setSelected] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!selected) return;
 
-    if (selected === "CUSTOMER") {
-      navigation.navigate("EnterName", {
-        nextScreen: "CustomerSetLocation",
-        finalNextScreen: "CustomerHome",
-        userId: fakeUserId,
-        phone,
-        name,
+    const role = selected === "CUSTOMER" ? "customer" : "worker";
+
+    try {
+      setLoading(true);
+
+      // ✅ Save role in DB
+      await axios.post(`${BASE_URL}/api/auth/save-role`, {
+        userId,
+        role,
       });
-    } else {
-      navigation.navigate("WorkerEnterName", {
-        nextScreen: "WorkerSetLocationScreen",
-        finalNextScreen: "WorkerHome",
-        userId: fakeUserId,
-        phone,
-        name,
-      });
+
+      // ✅ Navigate based on role
+      if (role === "customer") {
+        navigation.replace("EnterName", {
+          nextScreen: "CustomerSetLocation",
+          finalNextScreen: "CustomerHome",
+          userId,
+          phone,
+          name,
+        });
+      } else {
+        navigation.replace("WorkerEnterName", {
+          nextScreen: "WorkerSetLocationScreen",
+          finalNextScreen: "WorkerHome",
+          userId,
+          phone,
+          name,
+        });
+      }
+    } catch (err) {
+      Alert.alert("Error", "Failed to save role. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,7 +75,7 @@ export default function RoleSelectionScreen({ navigation, route }) {
 
           {/* Progress */}
           <View style={styles.progressBar}>
-            <View style={styles.progressFill}></View>
+            <View style={styles.progressFill} />
           </View>
         </View>
 
@@ -109,21 +132,29 @@ export default function RoleSelectionScreen({ navigation, route }) {
 
         {/* ---------- CONTINUE BUTTON ---------- */}
         <TouchableOpacity
-          style={[styles.continueBtn, !selected && styles.disabled]}
-          disabled={!selected}
+          style={[
+            styles.continueBtn,
+            (!selected || loading) && styles.disabled,
+          ]}
+          disabled={!selected || loading}
           onPress={handleContinue}
         >
-          <Text style={styles.continueText}>Continue</Text>
+          <Text style={styles.continueText}>
+            {loading ? "Saving..." : "Continue"}
+          </Text>
         </TouchableOpacity>
 
         {/* ---------- Bottom Link ---------- */}
         <TouchableOpacity style={styles.bottomLinkWrap}>
           <Text style={styles.bottomLink}>Which one should I choose?</Text>
         </TouchableOpacity>
+
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+
 
 const { width } = Dimensions.get("window");
 

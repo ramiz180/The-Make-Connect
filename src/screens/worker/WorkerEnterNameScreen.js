@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,30 +9,56 @@ import {
   KeyboardAvoidingView,
   Platform,
   Dimensions,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 
+//const BASE_URL = "http://192.168.1.102:3000";
+const BASE_URL = "http://10.45.106.84:3000";
+
 const { width, height } = Dimensions.get("window");
 
 export default function WorkerEnterNameScreen({ navigation, route }) {
-  const { nextScreen = "WorkerSetLocationScreen", userId, phone } = route?.params || {};
+  const { nextScreen = "WorkerSetLocationScreen", userId, phone, finalNextScreen } =
+    route?.params || {};
 
   const [fullName, setFullName] = useState("");
 
-  const handleBack = () => {
-    navigation.goBack();
-  };
+  useEffect(() => {
+    console.log("WorkerEnterName params:", route.params);
 
-  const handleContinue = () => {
+    if (!userId) {
+      Alert.alert(
+        "Session Error",
+        "User session missing. Please login again.",
+        [{ text: "OK", onPress: () => navigation.reset({
+          index: 0,
+          routes: [{ name: "Welcome" }],
+        }) }]
+      );
+    }
+  }, []);
+
+  const handleContinue = async () => {
     if (!fullName.trim()) return;
 
-    navigation.navigate(nextScreen, {
-      userId,
-      phone,
-      name: fullName.trim(),
-      nextScreen: route?.params?.finalNextScreen,
-    });
+    try {
+      await axios.post(`${BASE_URL}/api/auth/save-name`, {
+        userId,
+        name: fullName.trim(),
+      });
+
+      navigation.replace(nextScreen, {
+        userId,
+        phone,
+        name: fullName.trim(),
+        nextScreen: finalNextScreen,
+      });
+    } catch (err) {
+      console.log("Save name error:", err.response?.data || err.message);
+      Alert.alert("Error", "Failed to save name");
+    }
   };
 
   const isDisabled = !fullName.trim();
@@ -42,54 +69,34 @@ export default function WorkerEnterNameScreen({ navigation, route }) {
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <View style={styles.backgroundContainer}>
-          <View style={styles.backgroundImage}>
-            <View style={styles.overlay} />
+        <View style={styles.contentContainer}>
+          <View style={styles.logoContainer}>
+            <View style={styles.logoCircle}>
+              <MaterialIcons name="handyman" size={32} color="#0A0A0A" />
+            </View>
+            <Text style={styles.brandText}>The Make Connect</Text>
           </View>
-          <View style={styles.glow} />
 
-          <View style={styles.contentContainer}>
-            {/* Logo */}
-            <View style={styles.logoContainer}>
-              <View style={styles.logoCircle}>
-                <MaterialIcons name="handyman" size={32} color="#0A0A0A" />
-              </View>
-              <Text style={styles.brandText}>The Make Connect</Text>
-            </View>
+          <View style={styles.mainContent}>
+            <Text style={styles.title}>What is your name?</Text>
 
-            {/* Main Content */}
-            <View style={styles.mainContent}>
-              <View style={styles.textContainer}>
-                <Text style={styles.title}>What is your name?</Text>
-              </View>
-
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.inputField}
-                  placeholder="Your full name"
-                  placeholderTextColor="rgba(255, 255, 255, 0.5)"
-                  value={fullName}
-                  onChangeText={setFullName}
-                  returnKeyType="done"
-                  onSubmitEditing={handleContinue}
-                  autoCapitalize="words"
-                  autoCorrect={false}
-                />
-              </View>
-            </View>
-
-            {/* Continue Button */}
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={[styles.continueButton, isDisabled && styles.continueButtonDisabled]}
-                onPress={handleContinue}
-                disabled={isDisabled}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.continueButtonText}>Continue</Text>
-              </TouchableOpacity>
-            </View>
+            <TextInput
+              style={styles.inputField}
+              placeholder="Your full name"
+              placeholderTextColor="rgba(255,255,255,0.5)"
+              value={fullName}
+              onChangeText={setFullName}
+              autoCapitalize="words"
+            />
           </View>
+
+          <TouchableOpacity
+            style={[styles.continueButton, isDisabled && styles.disabled]}
+            disabled={isDisabled}
+            onPress={handleContinue}
+          >
+            <Text style={styles.continueButtonText}>Continue</Text>
+          </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
