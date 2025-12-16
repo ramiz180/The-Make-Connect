@@ -14,7 +14,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import axios from "axios";
 
 //const BASE_URL = "http://10.45.106.84:3000"; // 🔴 change to your PC IP
-const BASE_URL = "http://10.45.106.84:3000";
+const BASE_URL = "http://192.168.29.199:3000";
 
 
 export default function RoleSelectionScreen({ navigation, route }) {
@@ -40,7 +40,7 @@ export default function RoleSelectionScreen({ navigation, route }) {
       // ✅ Navigate based on role
       if (role === "customer") {
         navigation.replace("EnterName", {
-          nextScreen: "CustomerSetLocation",
+          nextScreen: "SearchLocation",
           finalNextScreen: "CustomerHome",
           userId,
           phone,
@@ -48,7 +48,7 @@ export default function RoleSelectionScreen({ navigation, route }) {
         });
       } else {
         navigation.replace("WorkerEnterName", {
-          nextScreen: "WorkerSetLocationScreen",
+          nextScreen: "WorkerSearchLocationScreen",
           finalNextScreen: "WorkerHome",
           userId,
           phone,

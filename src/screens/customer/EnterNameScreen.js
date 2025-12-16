@@ -15,12 +15,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 
 //const BASE_URL = "http://192.168.1.102:3000";
-const BASE_URL = "http://10.45.106.84:3000";
+const BASE_URL = "http://192.168.29.199:3000";
 
 const { width, height } = Dimensions.get("window");
 
 export default function EnterNameScreen({ navigation, route }) {
-  const { nextScreen = "CustomerSetLocation", userId, phone, finalNextScreen } =
+  const { nextScreen = "SearchLocation", userId, phone, finalNextScreen } =
     route?.params || {};
 
   const [fullName, setFullName] = useState("");

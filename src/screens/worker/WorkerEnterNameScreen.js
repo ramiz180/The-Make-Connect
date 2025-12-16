@@ -15,12 +15,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 
 //const BASE_URL = "http://192.168.1.102:3000";
-const BASE_URL = "http://10.45.106.84:3000";
+const BASE_URL = "http://192.168.29.199:3000";
 
 const { width, height } = Dimensions.get("window");
 
 export default function WorkerEnterNameScreen({ navigation, route }) {
-  const { nextScreen = "WorkerSetLocationScreen", userId, phone, finalNextScreen } =
+  const { nextScreen = "WorkerSearchLocationScreen", userId, phone, finalNextScreen } =
     route?.params || {};
 
   const [fullName, setFullName] = useState("");
@@ -53,7 +53,7 @@ export default function WorkerEnterNameScreen({ navigation, route }) {
         userId,
         phone,
         name: fullName.trim(),
-        nextScreen: finalNextScreen,
+        finalNextScreen,
       });
     } catch (err) {
       console.log("Save name error:", err.response?.data || err.message);

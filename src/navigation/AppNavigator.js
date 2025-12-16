@@ -13,6 +13,19 @@ import RoleSelectionScreen from "../screens/Common/RoleSelectionScreen";
 import EnterNameScreen from "../screens/customer/EnterNameScreen";
 import CustomerSetLocationScreen from "../screens/customer/CustomerSetLocationScreen";
 import WorkerSetLocationScreen from "../screens/worker/WorkerSetLocationScreen";
+import WorkerSearchLocationScreen from "../screens/worker/WorkerSearchLocationScreen";
+
+import SearchLocationScreen from "../screens/customer/SearchLocationScreen";
+
+
+
+
+
+
+
+
+
+
 
 // Customer Screens
 import CustomerHome from "../screens/customer/CustomerHome";
@@ -53,6 +66,31 @@ export default function AppNavigator() {
         <Stack.Screen name="EnterName" component={EnterNameScreen} />
         <Stack.Screen name="CustomerSetLocation" component={CustomerSetLocationScreen} />
         <Stack.Screen name="WorkerSetLocationScreen" component={WorkerSetLocationScreen} />
+        <Stack.Screen
+          name="WorkerSearchLocationScreen"
+          component={WorkerSearchLocationScreen}
+        />
+
+
+
+
+        {/* LOCATION (COMMON FOR ALL) */}
+        <Stack.Screen name="SearchLocation" component={SearchLocationScreen} />
+       
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         {/* CUSTOMER */}
         <Stack.Screen name="CustomerHome" component={CustomerHome} />

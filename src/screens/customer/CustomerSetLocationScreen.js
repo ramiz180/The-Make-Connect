@@ -13,7 +13,8 @@ import * as Location from "expo-location";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CustomerSetLocationScreen({ navigation, route }) {
-  const { nextScreen, userId, phone, name } = route.params || {};
+  const { userId, phone, name } = route.params || {};
+
 
   const [loading, setLoading] = useState(true);
   const [coords, setCoords] = useState(null);
