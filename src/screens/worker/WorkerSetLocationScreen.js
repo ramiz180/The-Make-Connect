@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+/*import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -551,4 +551,342 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     textTransform: "uppercase",
   },
+});*/
+
+
+
+
+
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+  Image,
+  TextInput,
+  ScrollView,
+} from "react-native";
+import * as Location from "expo-location";
+import axios from "axios";
+import MapView, { Marker } from "react-native-maps";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+/* ================== CONFIG ================== */
+
+// ✅ Backend API URL
+const API = "http://10.45.106.84:3000/api";
+
+// ✅ Google Maps API Key (NO .env)
+const GOOGLE_MAPS_KEY = "AIzaSyB43OA5-4D61nQAeC5iXmLYQmDAEHQIgd8";
+
+/* ============================================ */
+
+export default function WorkerSetLocationScreen({ navigation, route }) {
+  const {
+    nextScreen = "WorkerHome",
+    userId,
+    phone,
+    name,
+    radius = "5 km",
+  } = route.params || {};
+
+  const [loading, setLoading] = useState(true);
+  const [coords, setCoords] = useState(null);
+  const [areaName, setAreaName] = useState("");
+  const [fullAddress, setFullAddress] = useState("");
+  const [house, setHouse] = useState("");
+  const [apartment, setApartment] = useState("");
+  const [directions, setDirections] = useState("");
+  const [saveAs, setSaveAs] = useState("work");
+
+  /* ================== LOCATION ================== */
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { status } =
+          await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          alert("Permission denied. Please allow location access.");
+          setLoading(false);
+          return;
+        }
+
+        const loc = await Location.getCurrentPositionAsync({});
+        const currentCoords = {
+          latitude: loc.coords.latitude,
+          longitude: loc.coords.longitude,
+        };
+
+        setCoords(currentCoords);
+
+        const geocode = await Location.reverseGeocodeAsync(currentCoords);
+        if (geocode && geocode.length > 0) {
+          const g = geocode[0];
+
+          setAreaName(
+            [g.name || g.street, g.subregion || g.city]
+              .filter(Boolean)
+              .join(", ") || "Current Location"
+          );
+
+          setFullAddress(
+            [
+              g.name,
+              g.street,
+              g.district,
+              g.subregion || g.city,
+              g.region,
+              g.postalCode,
+              g.country,
+            ]
+              .filter(Boolean)
+              .join(", ")
+          );
+        }
+      } catch (error) {
+        console.log("Location error:", error);
+        setCoords(null);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  /* ================== SAVE WORKER LOCATION ================== */
+
+  const handleConfirm = async () => {
+    if (!coords) return;
+
+    try {
+      await axios.post(`${API}/worker-location/save`, {
+        userId,
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        areaName,
+        fullAddress,
+        house,
+        apartment,
+        directions,
+        label: saveAs,
+        serviceRadius: radius,
+      });
+
+      navigation.replace(nextScreen, {
+        userId,
+        phone,
+        name,
+      });
+    } catch (err) {
+      console.log("Worker location save error:", err.message);
+    }
+  };
+
+  /* ================== UI HELPERS ================== */
+
+  const renderSaveAsChip = (value, iconLabel, text) => {
+    const selected = saveAs === value;
+    return (
+      <TouchableOpacity
+        onPress={() => setSaveAs(value)}
+        style={[styles.chip, selected && styles.chipSelected]}
+      >
+        <Text style={[styles.chipIcon, selected && styles.chipIconSelected]}>
+          {iconLabel}
+        </Text>
+        <Text style={[styles.chipText, selected && styles.chipTextSelected]}>
+          {text}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
+
+  /* ================== RENDER ================== */
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        {/* HEADER IMAGE */}
+        <View style={styles.headerImageWrapper}>
+          <Image
+            source={{
+              uri: "https://images.pexels.com/photos/2387873/pexels-photo-2387873.jpeg?auto=compress&cs=tinysrgb&w=800",
+            }}
+            style={styles.headerImage}
+          />
+          <View style={styles.headerOverlay} />
+          <View style={styles.headerContent}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Text style={styles.backIcon}>{"<"}</Text>
+            </TouchableOpacity>
+            <View style={styles.headerTitleWrap}>
+              <Text style={styles.headerTitle}>Enter Address</Text>
+              <Text style={styles.headerSubtitle}>The Make Connect</Text>
+            </View>
+            <View style={styles.headerSpacer} />
+          </View>
+        </View>
+
+        {/* MAIN CARD */}
+        <View style={styles.mainCardWrapper}>
+          {loading ? (
+            <View style={styles.loaderWrap}>
+              <ActivityIndicator size="large" color="#45D39A" />
+              <Text style={styles.loadText}>Fetching your location...</Text>
+            </View>
+          ) : !coords ? (
+            <Text style={styles.error}>Unable to fetch location</Text>
+          ) : (
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {/* GOOGLE MAP */}
+              <View style={styles.mapWrapper}>
+                <MapView
+                  style={styles.map}
+                  provider="google"
+                  region={{
+                    latitude: coords.latitude,
+                    longitude: coords.longitude,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                  }}
+                >
+                  <Marker coordinate={coords} />
+                </MapView>
+              </View>
+
+              {/* ADDRESS */}
+              <View style={styles.addressHeader}>
+                <Text style={styles.addressIcon}>📍</Text>
+                <View>
+                  <Text style={styles.addressTitle}>{areaName}</Text>
+                  <Text style={styles.addressSubtitle}>{fullAddress}</Text>
+                </View>
+              </View>
+
+              {/* INPUTS */}
+              <View style={styles.fieldWrapper}>
+                <Text style={styles.fieldLabel}>HOUSE / FLAT / BLOCK NO.</Text>
+                <TextInput style={styles.input} value={house} onChangeText={setHouse} />
+              </View>
+
+              <View style={styles.fieldWrapper}>
+                <Text style={styles.fieldLabel}>APARTMENT / ROAD / AREA</Text>
+                <TextInput
+                  style={styles.input}
+                  value={apartment}
+                  onChangeText={setApartment}
+                />
+              </View>
+
+              {/* SAVE AS */}
+              <View style={styles.saveAsWrapper}>
+                <Text style={styles.fieldLabel}>SAVE AS</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  {renderSaveAsChip("home", "🏠", "Home")}
+                  {renderSaveAsChip("work", "💼", "Work")}
+                  {renderSaveAsChip("other", "📍", "Other")}
+                </ScrollView>
+              </View>
+            </ScrollView>
+          )}
+        </View>
+
+        {/* FOOTER */}
+        <View style={styles.footer}>
+          <TouchableOpacity
+            style={[styles.btn, (!coords || loading) && styles.disabled]}
+            disabled={!coords || loading}
+            onPress={handleConfirm}
+          >
+            <Text style={styles.btnText}>SAVE WORK LOCATION</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+/* ================== STYLES ================== */
+
+const styles = StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: "#0A0A0A" },
+  container: { flex: 1, backgroundColor: "#0A0A0A" },
+
+  headerImageWrapper: { height: 180 },
+  headerImage: { ...StyleSheet.absoluteFillObject },
+  headerOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.6)" },
+
+  headerContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 16,
+  },
+
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  backIcon: { color: "#fff", fontSize: 18 },
+  headerTitleWrap: { alignItems: "center" },
+  headerTitle: { color: "#fff", fontSize: 18, fontWeight: "700" },
+  headerSubtitle: { color: "#45D39A", fontSize: 10, fontWeight: "700" },
+
+  mainCardWrapper: { flex: 1, padding: 16 },
+  loaderWrap: { flex: 1, justifyContent: "center", alignItems: "center" },
+  loadText: { color: "#E5E7EB", marginTop: 10 },
+  error: { color: "#F87171", textAlign: "center" },
+
+  mapWrapper: {
+    height: 200,
+    borderRadius: 16,
+    overflow: "hidden",
+    marginBottom: 16,
+  },
+  map: { flex: 1 },
+
+  addressHeader: { flexDirection: "row", marginBottom: 16 },
+  addressIcon: { fontSize: 24, marginRight: 8 },
+  addressTitle: { color: "#fff", fontSize: 18, fontWeight: "700" },
+  addressSubtitle: { color: "#9CA3AF" },
+
+  fieldWrapper: { marginBottom: 16 },
+  fieldLabel: { color: "#6B7280", fontSize: 11, fontWeight: "700" },
+  input: {
+    backgroundColor: "#1F1F1F",
+    borderRadius: 16,
+    padding: 12,
+    color: "#fff",
+  },
+
+  chip: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    borderRadius: 999,
+    backgroundColor: "#1F1F1F",
+    marginRight: 10,
+  },
+  chipSelected: { backgroundColor: "#45D39A" },
+
+  footer: { padding: 16 },
+  btn: {
+    height: 56,
+    backgroundColor: "#45D39A",
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  disabled: { opacity: 0.6 },
+  btnText: { color: "#000", fontWeight: "700" },
 });
+

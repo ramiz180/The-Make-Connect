@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+/*import React, { useState } from "react";
 import {
   View,
   Text,
@@ -293,6 +293,142 @@ const styles = StyleSheet.create({
   confirmText: {
     color: "#000000",
     fontSize: 16,
+    fontWeight: "700",
+  },
+});*/
+
+
+
+
+
+
+
+
+
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import MapView, { Marker } from "react-native-maps";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import * as Location from "expo-location";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+/* ================== CONFIG ================== */
+
+// ✅ Google Maps API Key (DIRECT)
+const GOOGLE_KEY = "AIzaSyB43OA5-4D61nQAeC5iXmLYQmDAEHQIgd8";
+
+// ✅ Backend API URL (DIRECT)
+const API = "http://10.45.106.84:3000/api";
+
+/* ============================================ */
+
+export default function SearchLocationScreen({ navigation, route }) {
+  const { userId, phone, name } = route.params || {};
+  const [region, setRegion] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      const { status } =
+        await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        alert("Location permission denied");
+        return;
+      }
+
+      const loc = await Location.getCurrentPositionAsync({});
+      setRegion({
+        latitude: loc.coords.latitude,
+        longitude: loc.coords.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
+    })();
+  }, []);
+
+  const handleConfirm = () => {
+    navigation.replace("CustomerSetLocation", {
+      userId,
+      phone,
+      name,
+      coords: {
+        latitude: region.latitude,
+        longitude: region.longitude,
+      },
+    });
+  };
+
+  if (!region) return null;
+
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      {/* 🔍 SEARCH BAR */}
+      <GooglePlacesAutocomplete
+        placeholder="Search area, street..."
+        fetchDetails
+        onPress={(data, details = null) => {
+          if (!details) return;
+          const loc = details.geometry.location;
+          setRegion({
+            latitude: loc.lat,
+            longitude: loc.lng,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          });
+        }}
+        query={{
+          key: GOOGLE_KEY,
+          language: "en",
+        }}
+        styles={{
+          container: styles.searchContainer,
+          listView: { backgroundColor: "#fff" },
+        }}
+      />
+
+      {/* 🗺 MAP */}
+      <MapView
+        style={{ flex: 1 }}
+        region={region}
+        onRegionChangeComplete={setRegion}
+      >
+        <Marker
+          draggable
+          coordinate={region}
+          onDragEnd={(e) =>
+            setRegion({
+              ...region,
+              ...e.nativeEvent.coordinate,
+            })
+          }
+        />
+      </MapView>
+
+      {/* ✅ CONFIRM */}
+      <TouchableOpacity style={styles.btn} onPress={handleConfirm}>
+        <Text style={styles.btnText}>CONFIRM LOCATION</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  searchContainer: {
+    position: "absolute",
+    top: 10,
+    width: "100%",
+    zIndex: 1,
+  },
+  btn: {
+    position: "absolute",
+    bottom: 20,
+    alignSelf: "center",
+    backgroundColor: "#45D39A",
+    padding: 16,
+    borderRadius: 14,
+    width: "90%",
+  },
+  btnText: {
+    textAlign: "center",
     fontWeight: "700",
   },
 });

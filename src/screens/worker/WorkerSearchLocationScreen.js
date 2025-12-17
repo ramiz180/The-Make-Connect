@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+/*import React, { useState } from "react";
 import {
   View,
   Text,
@@ -346,4 +346,287 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700",
   },
+});*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialIcons } from "@expo/vector-icons";
+import * as Location from "expo-location";
+import MapView, { Marker } from "react-native-maps";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+
+/* ================== CONFIG ================== */
+
+// ✅ Google Maps API Key (NO .env)
+const GOOGLE_MAPS_KEY = "AIzaSyB43OA5-4D61nQAeC5iXmLYQmDAEHQIgd8";
+
+const API = "http://10.45.106.84:3000/api";
+
+/* ============================================ */
+
+export default function WorkerSearchLocationScreen({ navigation, route }) {
+  const { userId, phone, name, finalNextScreen = "WorkerHome" } =
+    route?.params || {};
+
+  const [region, setRegion] = useState(null);
+  const [radius, setRadius] = useState("5 km");
+
+  /* ================== GET CURRENT LOCATION ================== */
+
+  useEffect(() => {
+    (async () => {
+      const { status } =
+        await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") return;
+
+      const loc = await Location.getCurrentPositionAsync({});
+      setRegion({
+        latitude: loc.coords.latitude,
+        longitude: loc.coords.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
+    })();
+  }, []);
+
+  /* ================== CONFIRM ================== */
+
+  const handleConfirm = () => {
+    if (!region) return;
+
+    navigation.replace("WorkerSetLocationScreen", {
+      userId,
+      phone,
+      name,
+      nextScreen: finalNextScreen,
+      radius,
+      coords: {
+        latitude: region.latitude,
+        longitude: region.longitude,
+      },
+    });
+  };
+
+  /* ================== RADIUS UI ================== */
+
+  const renderRadiusChip = (label) => {
+    const selected = radius === label;
+    return (
+      <TouchableOpacity
+        key={label}
+        style={[styles.radiusChip, selected && styles.radiusChipSelected]}
+        onPress={() => setRadius(label)}
+      >
+        <Text
+          style={[
+            styles.radiusChipText,
+            selected && styles.radiusChipTextSelected,
+          ]}
+        >
+          {label}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
+
+  if (!region) return null;
+
+  /* ================== RENDER ================== */
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        {/* HEADER */}
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => navigation.goBack()}
+          >
+            <MaterialIcons name="arrow-back" size={24} color="#F6F8F6" />
+          </TouchableOpacity>
+
+          <View style={styles.headerCenter}>
+            <Text style={styles.headerTitle}>Set Your Location</Text>
+            <Text style={styles.headerSubtitle}>The Make Connect</Text>
+          </View>
+
+          <TouchableOpacity style={styles.iconButton}>
+            <MaterialIcons name="my-location" size={24} color="#F6F8F6" />
+          </TouchableOpacity>
+        </View>
+
+        {/* GOOGLE PLACES SEARCH */}
+        <GooglePlacesAutocomplete
+          placeholder="Search address, area..."
+          fetchDetails
+          onPress={(data, details = null) => {
+            const loc = details.geometry.location;
+            setRegion({
+              latitude: loc.lat,
+              longitude: loc.lng,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            });
+          }}
+          query={{
+            key: GOOGLE_MAPS_KEY,
+            language: "en",
+          }}
+          styles={{
+            container: styles.searchContainer,
+            textInput: styles.searchInput,
+            listView: { backgroundColor: "#fff" },
+          }}
+        />
+
+        {/* MAP */}
+        <View style={styles.mapWrapper}>
+          <MapView
+            style={styles.map}
+            provider="google"
+            region={region}
+            onRegionChangeComplete={setRegion}
+          >
+            <Marker
+              draggable
+              coordinate={region}
+              onDragEnd={(e) =>
+                setRegion({
+                  ...region,
+                  ...e.nativeEvent.coordinate,
+                })
+              }
+            />
+          </MapView>
+        </View>
+
+        {/* RADIUS */}
+        <View style={styles.radiusSection}>
+          <Text style={styles.radiusTitle}>Set Your Service Radius</Text>
+          <View style={styles.radiusRow}>
+            {["2 km", "5 km", "10 km", "City-wide"].map(renderRadiusChip)}
+          </View>
+        </View>
+
+        {/* FOOTER */}
+        <View style={styles.footer}>
+          <TouchableOpacity
+            style={styles.confirmButton}
+            onPress={handleConfirm}
+          >
+            <Text style={styles.confirmText}>Confirm Location</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+/* ================== STYLES ================== */
+
+const styles = StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: "#0A0A0A" },
+  container: { flex: 1, backgroundColor: "#0A0A0A" },
+
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 16,
+  },
+
+  iconButton: { width: 40 },
+  headerCenter: { alignItems: "center" },
+  headerTitle: { color: "#fff", fontSize: 18, fontWeight: "700" },
+  headerSubtitle: { color: "#45D39A", fontSize: 12 },
+
+  searchContainer: {
+    position: "absolute",
+    top: 80,
+    width: "100%",
+    zIndex: 10,
+    paddingHorizontal: 16,
+  },
+
+  searchInput: {
+    height: 48,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+  },
+
+  mapWrapper: {
+    flex: 1,
+    marginTop: 80,
+  },
+
+  map: {
+    flex: 1,
+  },
+
+  radiusSection: {
+    padding: 16,
+  },
+
+  radiusTitle: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "700",
+    marginBottom: 8,
+  },
+
+  radiusRow: {
+    flexDirection: "row",
+    backgroundColor: "#18181B",
+    borderRadius: 12,
+    padding: 4,
+  },
+
+  radiusChip: {
+    flex: 1,
+    height: 32,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  radiusChipSelected: {
+    backgroundColor: "#45D39A",
+    borderRadius: 8,
+  },
+
+  radiusChipText: { color: "#D4D4D8" },
+  radiusChipTextSelected: { color: "#000", fontWeight: "600" },
+
+  footer: {
+    padding: 16,
+  },
+
+  confirmButton: {
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: "#45D39A",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  confirmText: { color: "#000", fontWeight: "700", fontSize: 16 },
 });
+

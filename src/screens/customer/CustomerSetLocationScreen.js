@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+/*import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -77,7 +77,7 @@ export default function CustomerSetLocationScreen({ navigation, route }) {
   const handleConfirm = () => {
     if (!coords) return;
 
-    navigation.navigate(nextScreen, {
+    navigation.navigate("CustomerHome", {
       userId,
       phone,
       name,
@@ -551,5 +551,144 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
     textTransform: "uppercase",
+  },
+});*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
+import * as Location from "expo-location";
+import axios from "axios";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+/* ================== CONFIG ================== */
+
+// ❌ Google Maps key NOT needed here (kept only for consistency)
+const GOOGLE_MAPS_KEY = "AIzaSyB43OA5-4D61nQAeC5iXmLYQmDAEHQIgd8";
+
+// ✅ Backend API URL
+const API = "http://10.45.106.84:3000/api";
+
+/* ============================================ */
+
+export default function CustomerSetLocationScreen({ navigation, route }) {
+  const { userId, coords } = route.params;
+
+  const [areaName, setAreaName] = useState("");
+  const [fullAddress, setFullAddress] = useState("");
+  const [house, setHouse] = useState("");
+  const [apartment, setApartment] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const geo = await Location.reverseGeocodeAsync(coords);
+        if (geo.length > 0) {
+          const g = geo[0];
+          setAreaName(g.city || g.subregion || "Current Location");
+          setFullAddress(
+            `${g.name || ""}, ${g.street || ""}, ${g.city || ""}, ${g.region || ""}`
+          );
+        }
+      } catch (err) {
+        console.log("Reverse geocode error:", err);
+      }
+    })();
+  }, []);
+
+  const saveLocation = async () => {
+    try {
+      await axios.post(`${API}/location/save`, {
+        userId,
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        areaName,
+        fullAddress,
+        house,
+        apartment,
+        label: "home",
+      });
+
+      navigation.replace("CustomerHome");
+    } catch (err) {
+      console.log("Save location error:", err);
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>{areaName}</Text>
+      <Text style={styles.subtitle}>{fullAddress}</Text>
+
+      <TextInput
+        placeholder="House / Flat"
+        style={styles.input}
+        value={house}
+        onChangeText={setHouse}
+      />
+
+      <TextInput
+        placeholder="Apartment / Road"
+        style={styles.input}
+        value={apartment}
+        onChangeText={setApartment}
+      />
+
+      <TouchableOpacity style={styles.btn} onPress={saveLocation}>
+        <Text style={styles.btnText}>SAVE ADDRESS</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#fff",
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  subtitle: {
+    color: "#666",
+    marginBottom: 20,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 12,
+  },
+  btn: {
+    backgroundColor: "#45D39A",
+    padding: 16,
+    borderRadius: 12,
+  },
+  btnText: {
+    textAlign: "center",
+    fontWeight: "700",
+    color: "#000",
   },
 });

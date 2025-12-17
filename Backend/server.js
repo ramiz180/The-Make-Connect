@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
-
+const workerLocationRoutes = require("./routes/workerLocationRoutes");
 dotenv.config();
 connectDB();
 
@@ -13,6 +13,8 @@ app.use(express.json());
 
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/location", require("./routes/locationRoutes"));
+app.use("/api/worker-location", workerLocationRoutes);
+
 
 
 const PORT = process.env.PORT || 3000;

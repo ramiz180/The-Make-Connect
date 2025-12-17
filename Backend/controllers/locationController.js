@@ -1,17 +1,17 @@
 const Location = require("../models/Location");
 
 exports.saveLocation = async (req, res) => {
-  const { userId, role, address } = req.body;
-
-  if (!userId || !role || !address) {
-    return res.status(400).json({ success: false });
+  try {
+    const location = await Location.create(req.body);
+    res.json({ success: true, location });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
   }
+};
 
-  await Location.findOneAndUpdate(
-    { userId, role },
-    { userId, role, ...address },
-    { upsert: true, new: true }
-  );
-
-  res.json({ success: true });
+exports.getUserLocations = async (req, res) => {
+  const locations = await Location.find({
+    userId: req.params.userId,
+  });
+  res.json(locations);
 };

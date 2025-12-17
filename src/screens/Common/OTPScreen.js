@@ -16,7 +16,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import axios from "axios";
 
 // ✅ USE YOUR CORRECT PC IP
-const BASE_URL = "http://192.168.29.199:3000";
+const BASE_URL = "http://10.45.106.84:3000";
 
 const OTPScreen = ({ navigation, route }) => {
   const { phoneNumber } = route.params;
