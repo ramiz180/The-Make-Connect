@@ -31,6 +31,8 @@ import SearchLocationScreen from "../screens/customer/SearchLocationScreen";
 import CustomerHome from "../screens/customer/CustomerHome";
 import WorkerList from "../screens/customer/WorkerList";
 import CustomerBookingConfirm from "../screens/customer/CustomerBookingConfirm";
+import CustomerBookings from "../screens/customer/CustomerBookings";
+
 
 // Worker Setup Navigator
 import WorkerSetupNavigator from "./WorkerSetupNavigator";
@@ -42,7 +44,7 @@ import WorkerChatScreen from "../screens/worker/WorkerChatScreen";
 import VerificationStatus from "../screens/worker/VerificationStatus";
 import AddService from "../screens/worker/AddService";
 import MyServices from "../screens/worker/MyServices";
-import WorkerBookingScreen from "../screens/worker/BookingScreen";
+import WorkerBookingScreen from "../screens/worker/WorkerBookingScreen";
 import WorkerChatList from "../screens/worker/ChatScreen";
 import WorkerProfile from "../screens/worker/WorkerProfile";
 import EditWorkerProfile from "../screens/worker/EditWorkerProfile";
@@ -96,6 +98,7 @@ export default function AppNavigator() {
         <Stack.Screen name="CustomerHome" component={CustomerHome} />
         <Stack.Screen name="WorkerList" component={WorkerList} />
         <Stack.Screen name="CustomerBookingConfirm" component={CustomerBookingConfirm} />
+        <Stack.Screen name="CustomerBookings" component={CustomerBookings} />
 
         {/* WORKER SETUP */}
         <Stack.Screen name="WorkerSetup" component={WorkerSetupNavigator} />

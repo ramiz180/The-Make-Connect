@@ -557,6 +557,11 @@ const styles = StyleSheet.create({
 
 
 
+
+
+
+
+
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -576,7 +581,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 /* ================== CONFIG ================== */
 
 // ✅ Backend API URL
-const API = "http://10.45.106.84:3000/api";
+const API = "http://192.168.29.199:3000/api";
 
 // ✅ Google Maps API Key (NO .env)
 const GOOGLE_MAPS_KEY = "AIzaSyB43OA5-4D61nQAeC5iXmLYQmDAEHQIgd8";
@@ -661,16 +666,18 @@ export default function WorkerSetLocationScreen({ navigation, route }) {
     if (!coords) return;
 
     try {
-      await axios.post(`${API}/worker-location/save`, {
+      await axios.post(`${API}/worker/save-location`, {
         userId,
         latitude: coords.latitude,
         longitude: coords.longitude,
-        areaName,
-        fullAddress,
-        house,
-        apartment,
-        directions,
-        label: saveAs,
+        address: {
+          areaName,
+          fullAddress,
+          house,
+          apartment,
+          directions,
+          label: saveAs,
+        },
         serviceRadius: radius,
       });
 

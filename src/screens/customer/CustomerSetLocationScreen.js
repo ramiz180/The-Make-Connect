@@ -558,16 +558,6 @@ const styles = StyleSheet.create({
 
 
 
-
-
-
-
-
-
-
-
-
-
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -575,46 +565,41 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  ScrollView,
+  Image,
 } from "react-native";
 import * as Location from "expo-location";
 import axios from "axios";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 /* ================== CONFIG ================== */
-
-// ❌ Google Maps key NOT needed here (kept only for consistency)
-const GOOGLE_MAPS_KEY = "AIzaSyB43OA5-4D61nQAeC5iXmLYQmDAEHQIgd8";
-
-// ✅ Backend API URL
-const API = "http://10.45.106.84:3000/api";
-
+const API = "http://192.168.29.199:3000/api";
 /* ============================================ */
 
 export default function CustomerSetLocationScreen({ navigation, route }) {
-  const { userId, coords } = route.params;
+  const { userId, coords, name } = route.params;
 
   const [areaName, setAreaName] = useState("");
   const [fullAddress, setFullAddress] = useState("");
   const [house, setHouse] = useState("");
   const [apartment, setApartment] = useState("");
+  const [directions, setDirections] = useState("");
+  const [saveAs, setSaveAs] = useState("home");
 
   useEffect(() => {
     (async () => {
-      try {
-        const geo = await Location.reverseGeocodeAsync(coords);
-        if (geo.length > 0) {
-          const g = geo[0];
-          setAreaName(g.city || g.subregion || "Current Location");
-          setFullAddress(
-            `${g.name || ""}, ${g.street || ""}, ${g.city || ""}, ${g.region || ""}`
-          );
-        }
-      } catch (err) {
-        console.log("Reverse geocode error:", err);
+      const geo = await Location.reverseGeocodeAsync(coords);
+      if (geo.length) {
+        const g = geo[0];
+        setAreaName(g.city || g.subregion || "Current Location");
+        setFullAddress(
+          `${g.name || ""}, ${g.street || ""}, ${g.city || ""}, ${g.region || ""}`
+        );
       }
     })();
   }, []);
 
+  /* ================== SAVE LOCATION ================== */
   const saveLocation = async () => {
     try {
       await axios.post(`${API}/location/save`, {
@@ -625,70 +610,129 @@ export default function CustomerSetLocationScreen({ navigation, route }) {
         fullAddress,
         house,
         apartment,
-        label: "home",
+        label: saveAs,
       });
 
-      navigation.replace("CustomerHome");
+      /* 🔥🔥🔥 THIS IS THE FIX 🔥🔥🔥 */
+      navigation.replace("CustomerHome", {
+        userId,
+        name,
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        address: fullAddress,
+      });
     } catch (err) {
       console.log("Save location error:", err);
     }
   };
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>{areaName}</Text>
-      <Text style={styles.subtitle}>{fullAddress}</Text>
-
-      <TextInput
-        placeholder="House / Flat"
-        style={styles.input}
-        value={house}
-        onChangeText={setHouse}
-      />
-
-      <TextInput
-        placeholder="Apartment / Road"
-        style={styles.input}
-        value={apartment}
-        onChangeText={setApartment}
-      />
-
-      <TouchableOpacity style={styles.btn} onPress={saveLocation}>
-        <Text style={styles.btnText}>SAVE ADDRESS</Text>
+  const renderSaveAsChip = (value, label) => {
+    const selected = saveAs === value;
+    return (
+      <TouchableOpacity
+        key={value}
+        onPress={() => setSaveAs(value)}
+        style={[styles.chip, selected && styles.chipSelected]}
+      >
+        <Text style={[styles.chipText, selected && styles.chipTextSelected]}>
+          {label}
+        </Text>
       </TouchableOpacity>
+    );
+  };
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        {/* HEADER IMAGE */}
+        <View style={styles.headerImageWrapper}>
+          <Image
+            source={{
+              uri: "https://lh3.googleusercontent.com/aida-public/AB6AXuD-xSV9TCdDbo1hdy_jCXVrRIm9m4me932-f6_T7Mq250TyFEDclFABhpG0rzr6urXnlnEKC7ghVzNQhT2kvVaITIFs3p__2KtnnPiyzbkBw5ZNyKOuanCmmgJDe8FsjKh0vEIlNUKKdXEQ-tG5Jrvx22VzGkcPUA6X0DTzOc3wjF84YlhtvuvUhvNPS_q6NbKwfKkPdTghV-xdZbJ16UZ1xzYXrObpkIsfNKHF51UYGV8fP3p19NTF03Xoxh0huzAEMwWrdq-Krp8",
+            }}
+            style={styles.headerImage}
+          />
+          <View style={styles.headerOverlay} />
+        </View>
+
+        {/* CONTENT */}
+        <View style={styles.mainCardWrapper}>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <Text style={styles.addressTitle}>{areaName}</Text>
+            <Text style={styles.addressSubtitle}>{fullAddress}</Text>
+
+            <TextInput
+              style={styles.input}
+              placeholder="House / Flat / Block"
+              placeholderTextColor="#6B7280"
+              value={house}
+              onChangeText={setHouse}
+            />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Apartment / Road / Area"
+              placeholderTextColor="#6B7280"
+              value={apartment}
+              onChangeText={setApartment}
+            />
+
+            <View style={styles.chipRow}>
+              {renderSaveAsChip("home", "Home")}
+              {renderSaveAsChip("work", "Work")}
+              {renderSaveAsChip("other", "Other")}
+            </View>
+          </ScrollView>
+        </View>
+
+        {/* FOOTER */}
+        <View style={styles.footer}>
+          <TouchableOpacity style={styles.btn} onPress={saveLocation}>
+            <Text style={styles.btnText}>CONFIRM LOCATION</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </SafeAreaView>
   );
 }
 
+/* ================== STYLES ================== */
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#fff",
+  safeArea: { flex: 1, backgroundColor: "#0A0A0A" },
+  container: { flex: 1 },
+  headerImageWrapper: { height: 160 },
+  headerImage: { width: "100%", height: "100%" },
+  headerOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.6)",
   },
-  title: {
-    fontSize: 18,
-    fontWeight: "700",
-  },
-  subtitle: {
-    color: "#666",
-    marginBottom: 20,
-  },
+  mainCardWrapper: { flex: 1, padding: 16 },
+  addressTitle: { color: "#fff", fontSize: 20, fontWeight: "700" },
+  addressSubtitle: { color: "#9CA3AF", marginBottom: 16 },
   input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 12,
-    borderRadius: 10,
+    backgroundColor: "#1F1F1F",
+    borderRadius: 14,
+    padding: 14,
+    color: "#fff",
     marginBottom: 12,
   },
+  chipRow: { flexDirection: "row", gap: 8, marginTop: 8 },
+  chip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: "#1F1F1F",
+    borderRadius: 999,
+  },
+  chipSelected: { backgroundColor: "#45D39A" },
+  chipText: { color: "#9CA3AF" },
+  chipTextSelected: { color: "#000", fontWeight: "700" },
+  footer: { padding: 16 },
   btn: {
+    height: 56,
     backgroundColor: "#45D39A",
-    padding: 16,
-    borderRadius: 12,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  btnText: {
-    textAlign: "center",
-    fontWeight: "700",
-    color: "#000",
-  },
+  btnText: { color: "#000", fontWeight: "700" },
 });

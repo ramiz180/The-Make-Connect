@@ -1,350 +1,68 @@
-/*import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ImageBackground,
-  TextInput,
-  TouchableOpacity,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { MaterialIcons } from "@expo/vector-icons";
-
-export default function SearchLocationScreen({ navigation, route }) {
-  const { userId, phone, name } = route?.params || {};
-
-
-  const [search, setSearch] = useState("");
-
- const handleConfirm = () => {
-  navigation.replace("CustomerSetLocation", {
-    userId,
-    phone,
-    name,
-  });
-};
-
-
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={() => navigation.goBack()}
-          >
-            <MaterialIcons name="arrow-back" size={24} color="#F6F8F6" />
-          </TouchableOpacity>
-
-          <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>Set Your Location</Text>
-            <Text style={styles.headerSubtitle}>The Make Connect</Text>
-          </View>
-
-          <TouchableOpacity style={styles.iconButton}>
-            <MaterialIcons name="my-location" size={24} color="#F6F8F6" />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.mapWrapper}>
-          <ImageBackground
-            source={{
-              uri: "https://lh3.googleusercontent.com/aida-public/AB6AXuD-xSV9TCdDbo1hdy_jCXVrRIm9m4me932-f6_T7Mq250TyFEDclFABhpG0rzr6urXnlnEKC7ghVzNQhT2kvVaITIFs3p__2KtnnPiyzbkBw5ZNyKOuanCmmgJDe8FsjKh0vEIlNUKKdXEQ-tG5Jrvx22VzGkcPUA6X0DTzOc3wjF84YlhtvuvUhvNPS_q6NbKwfKkPdTghV-xdZbJ16UZ1xzYXrObpkIsfNKHF51UYGV8fP3p19NTF03Xoxh0huzAEMwWrdq-Krp8",
-            }}
-            style={styles.mapImage}
-          >
-            <View style={styles.mapOverlay} />
-
-            <View style={styles.searchBarWrapper}>
-              <View style={styles.searchBarInner}>
-                <MaterialIcons
-                  name="search"
-                  size={20}
-                  color="rgba(148,163,184,1)"
-                  style={styles.searchIcon}
-                />
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search address, city, or zip code"
-                  placeholderTextColor="rgba(148,163,184,1)"
-                  value={search}
-                  onChangeText={setSearch}
-                />
-              </View>
-            </View>
-
-            <View style={styles.mapControlsWrapper}>
-              <View style={styles.zoomButtons}>
-                <TouchableOpacity style={[styles.roundButton, styles.roundTop]}>
-                  <MaterialIcons
-                    name="add"
-                    size={22}
-                    color="#F6F8F6"
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.roundButton, styles.roundBottom]}>
-                  <MaterialIcons
-                    name="remove"
-                    size={22}
-                    color="#F6F8F6"
-                  />
-                </TouchableOpacity>
-              </View>
-
-              <TouchableOpacity style={styles.roundButton}>
-                <MaterialIcons
-                  name="navigation"
-                  size={22}
-                  color="#F6F8F6"
-                />
-              </TouchableOpacity>
-            </View>
-          </ImageBackground>
-        </View>
-
-        <Text style={styles.helperText}>Move the map to set your location</Text>
-
-        <View style={styles.selectedSection}>
-          <Text style={styles.selectedTitle}>Selected Location</Text>
-
-          <View style={styles.selectedCard}>
-            <View style={styles.locationIconWrap}>
-              <MaterialIcons name="location-on" size={24} color="#45D39A" />
-            </View>
-            <View style={styles.locationTextWrap}>
-              <Text style={styles.locationTitle}>4140 Parker Rd.</Text>
-              <Text style={styles.locationSubtitle}>
-                Allentown, New Mexico 31134
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.footer}>
-          <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
-            <Text style={styles.confirmText}>Confirm Location</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </SafeAreaView>
-  );
-}
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#0A0A0A",
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#0A0A0A",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 4,
-  },
-  iconButton: {
-    width: 48,
-    height: 48,
-    alignItems: "flex-start",
-    justifyContent: "center",
-  },
-  headerCenter: {
-    alignItems: "center",
-  },
-  headerTitle: {
-    color: "#F6F8F6",
-    fontSize: 18,
-    fontWeight: "700",
-  },
-  headerSubtitle: {
-    marginTop: 2,
-    color: "#45D39A",
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  mapWrapper: {
-    flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 8,
-  },
-  mapImage: {
-    flex: 1,
-    borderRadius: 16,
-    overflow: "hidden",
-    justifyContent: "space-between",
-  },
-  mapOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.3)",
-  },
-  searchBarWrapper: {
-    padding: 16,
-  },
-  searchBarInner: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(24,24,27,0.8)",
-    borderRadius: 12,
-    paddingHorizontal: 12,
-  },
-  searchIcon: {
-    marginRight: 4,
-  },
-  searchInput: {
-    flex: 1,
-    height: 48,
-    color: "#F6F8F6",
-  },
-  mapControlsWrapper: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "flex-end",
-    padding: 16,
-  },
-  zoomButtons: {
-    marginRight: 12,
-    borderRadius: 12,
-    overflow: "hidden",
-  },
-  roundButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: "rgba(24,24,27,0.8)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 4,
-  },
-  roundTop: {
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
-  },
-  roundBottom: {
-    borderTopLeftRadius: 0,
-    borderTopRightRadius: 0,
-    marginBottom: 0,
-  },
-  helperText: {
-    textAlign: "center",
-    color: "#9CA3AF",
-    fontSize: 13,
-    paddingTop: 8,
-    paddingBottom: 12,
-  },
-  selectedSection: {
-    paddingHorizontal: 16,
-    paddingBottom: 8,
-  },
-  selectedTitle: {
-    color: "#F6F8F6",
-    fontSize: 20,
-    fontWeight: "700",
-    marginBottom: 12,
-  },
-  selectedCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(24,24,27,0.8)",
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#27272A",
-  },
-  locationIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: "rgba(39,39,42,0.9)",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
-  locationTextWrap: {
-    flex: 1,
-  },
-  locationTitle: {
-    color: "#F6F8F6",
-    fontSize: 16,
-    fontWeight: "700",
-  },
-  locationSubtitle: {
-    marginTop: 4,
-    color: "#9CA3AF",
-    fontSize: 13,
-  },
-  footer: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-    paddingTop: 4,
-    backgroundColor: "#0A0A0A",
-  },
-  confirmButton: {
-    height: 56,
-    borderRadius: 16,
-    backgroundColor: "#45D39A",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  confirmText: {
-    color: "#000000",
-    fontSize: 16,
-    fontWeight: "700",
-  },
-});*/
-
-
-
-
-
-
-
-
-
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import * as Location from "expo-location";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { MaterialIcons } from "@expo/vector-icons";
 
 /* ================== CONFIG ================== */
-
-// ✅ Google Maps API Key (DIRECT)
 const GOOGLE_KEY = "AIzaSyB43OA5-4D61nQAeC5iXmLYQmDAEHQIgd8";
-
-// ✅ Backend API URL (DIRECT)
-const API = "http://10.45.106.84:3000/api";
-
+const API = "http://192.168.29.199:3000/api";
 /* ============================================ */
 
 export default function SearchLocationScreen({ navigation, route }) {
   const { userId, phone, name } = route.params || {};
-  const [region, setRegion] = useState(null);
 
+  const [region, setRegion] = useState(null);
+  const [selectedTitle, setSelectedTitle] = useState("");
+  const [selectedSubtitle, setSelectedSubtitle] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+
+  /* ================== INITIAL LOCATION ================== */
   useEffect(() => {
     (async () => {
-      const { status } =
-        await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        alert("Location permission denied");
-        return;
-      }
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") return;
 
       const loc = await Location.getCurrentPositionAsync({});
-      setRegion({
+      const initialRegion = {
         latitude: loc.coords.latitude,
         longitude: loc.coords.longitude,
         latitudeDelta: 0.01,
         longitudeDelta: 0.01,
-      });
+      };
+
+      setRegion(initialRegion);
+      updateAddressFromCoords(loc.coords);
     })();
   }, []);
 
+  /* ================== REVERSE GEOCODE ================== */
+  const updateAddressFromCoords = async (coords) => {
+    const geo = await Location.reverseGeocodeAsync(coords);
+    if (!geo.length) return;
+
+    const g = geo[0];
+    setSelectedTitle(
+      [g.name || g.street, g.subregion || g.city].filter(Boolean).join(", ")
+    );
+    setSelectedSubtitle(
+      [
+        g.name,
+        g.street,
+        g.district,
+        g.subregion || g.city,
+        g.region,
+        g.postalCode,
+        g.country,
+      ]
+        .filter(Boolean)
+        .join(", ")
+    );
+  };
+
+  /* ================== CONFIRM ================== */
   const handleConfirm = () => {
     navigation.replace("CustomerSetLocation", {
       userId,
@@ -360,75 +78,136 @@ export default function SearchLocationScreen({ navigation, route }) {
   if (!region) return null;
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      {/* 🔍 SEARCH BAR */}
-      <GooglePlacesAutocomplete
-        placeholder="Search area, street..."
-        fetchDetails
-        onPress={(data, details = null) => {
-          if (!details) return;
-          const loc = details.geometry.location;
-          setRegion({
-            latitude: loc.lat,
-            longitude: loc.lng,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          });
-        }}
-        query={{
-          key: GOOGLE_KEY,
-          language: "en",
-        }}
-        styles={{
-          container: styles.searchContainer,
-          listView: { backgroundColor: "#fff" },
-        }}
-      />
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        {/* HEADER */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <MaterialIcons name="arrow-back" size={24} color="#F6F8F6" />
+          </TouchableOpacity>
 
-      {/* 🗺 MAP */}
-      <MapView
-        style={{ flex: 1 }}
-        region={region}
-        onRegionChangeComplete={setRegion}
-      >
-        <Marker
-          draggable
-          coordinate={region}
-          onDragEnd={(e) =>
+          <View style={{ alignItems: "center" }}>
+            <Text style={styles.headerTitle}>Set Your Location</Text>
+            <Text style={styles.headerSubtitle}>The Make Connect</Text>
+          </View>
+
+          <View style={{ width: 24 }} />
+        </View>
+
+        {/* SEARCH */}
+        <GooglePlacesAutocomplete
+          placeholder="Search address, area, landmark"
+          fetchDetails
+          debounce={300}
+          listViewDisplayed="auto"
+          enablePoweredByContainer={false}
+          keyboardShouldPersistTaps="handled"
+          onPress={(data, details = null) => {
+            const loc = details.geometry.location;
+
             setRegion({
-              ...region,
-              ...e.nativeEvent.coordinate,
-            })
-          }
-        />
-      </MapView>
+              latitude: loc.lat,
+              longitude: loc.lng,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            });
 
-      {/* ✅ CONFIRM */}
-      <TouchableOpacity style={styles.btn} onPress={handleConfirm}>
-        <Text style={styles.btnText}>CONFIRM LOCATION</Text>
-      </TouchableOpacity>
+            setSelectedTitle(
+              details.name || data.structured_formatting?.main_text
+            );
+            setSelectedSubtitle(
+              details.formatted_address || data.description
+            );
+
+            setIsSearching(false);
+          }}
+          query={{
+            key: GOOGLE_KEY,
+            language: "en",
+            components: "country:in",
+          }}
+          textInputProps={{
+            onFocus: () => setIsSearching(true),
+            onChangeText: () => setIsSearching(true),
+            placeholderTextColor: "#9CA3AF",
+          }}
+          styles={{
+            container: { flex: 1, paddingHorizontal: 16 },
+            textInput: styles.searchInput,
+            listView: {
+              backgroundColor: "#020617",
+              borderRadius: 12,
+              marginTop: 8,
+            },
+            row: { padding: 16 },
+            description: { color: "#E5E7EB", fontSize: 14 },
+            separator: { height: 1, backgroundColor: "#1F2937" },
+          }}
+        />
+
+        {/* MAP + FOOTER */}
+        {!isSearching && (
+          <>
+            <View style={styles.mapWrapper}>
+              <MapView style={styles.map} region={region}>
+                <Marker draggable coordinate={region} />
+              </MapView>
+            </View>
+
+            <View style={styles.selectedCard}>
+              <MaterialIcons name="location-on" size={22} color="#45D39A" />
+              <View style={{ marginLeft: 12 }}>
+                <Text style={styles.locationTitle}>{selectedTitle}</Text>
+                <Text style={styles.locationSubtitle}>{selectedSubtitle}</Text>
+              </View>
+            </View>
+
+            <TouchableOpacity
+              style={styles.confirmButton}
+              onPress={handleConfirm}
+            >
+              <Text style={styles.confirmText}>Confirm & proceed</Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
     </SafeAreaView>
   );
 }
 
+/* ================== STYLES ================== */
 const styles = StyleSheet.create({
-  searchContainer: {
-    position: "absolute",
-    top: 10,
-    width: "100%",
-    zIndex: 1,
+  safeArea: { flex: 1, backgroundColor: "#0A0A0A" },
+  container: { flex: 1 },
+  header: { flexDirection: "row", justifyContent: "space-between", padding: 16 },
+  headerTitle: { color: "#F6F8F6", fontSize: 18, fontWeight: "700" },
+  headerSubtitle: { color: "#45D39A", fontSize: 12 },
+  searchInput: {
+    height: 48,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    backgroundColor: "rgba(24,24,27,0.95)",
+    color: "#F6F8F6",
   },
-  btn: {
-    position: "absolute",
-    bottom: 20,
-    alignSelf: "center",
-    backgroundColor: "#45D39A",
+  mapWrapper: { flex: 1, margin: 16, borderRadius: 16, overflow: "hidden" },
+  map: { flex: 1 },
+  selectedCard: {
+    flexDirection: "row",
+    alignItems: "center",
     padding: 16,
-    borderRadius: 14,
-    width: "90%",
+    marginHorizontal: 16,
+    backgroundColor: "rgba(24,24,27,0.8)",
+    borderRadius: 16,
   },
-  btnText: {
-    textAlign: "center",
-    fontWeight: "700",
+  locationTitle: { color: "#F6F8F6", fontSize: 16, fontWeight: "700" },
+  locationSubtitle: { color: "#9CA3AF", fontSize: 13 },
+  confirmButton: {
+    height: 56,
+    margin: 16,
+    borderRadius: 16,
+    backgroundColor: "#45D39A",
+    alignItems: "center",
+    justifyContent: "center",
   },
+  confirmText: { fontSize: 16, fontWeight: "700", color: "#000" },
 });

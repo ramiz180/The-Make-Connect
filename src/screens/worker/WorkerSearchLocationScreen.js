@@ -379,7 +379,7 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 // ✅ Google Maps API Key (NO .env)
 const GOOGLE_MAPS_KEY = "AIzaSyB43OA5-4D61nQAeC5iXmLYQmDAEHQIgd8";
 
-const API = "http://10.45.106.84:3000/api";
+const API = "http://192.168.29.199:3000/api";
 
 /* ============================================ */
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+/*import React, { useState } from "react";
 import {
   View,
   Text,
@@ -29,13 +29,11 @@ export default function CustomerBookingConfirm({ navigation, route }) {
   const [notes, setNotes] = useState("");
 
   const handleConfirm = () => {
-    // TODO: integrate API and then navigate to success screen
     navigation.goBack();
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
       <View style={styles.headerRow}>
         <TouchableOpacity
           style={styles.headerIcon}
@@ -54,7 +52,6 @@ export default function CustomerBookingConfirm({ navigation, route }) {
         contentContainerStyle={{ paddingBottom: 140, paddingHorizontal: 20 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Worker card */}
         <View style={styles.workerCard}>
           <View style={styles.workerTop}>
             <View style={styles.workerAvatarWrap}>
@@ -88,7 +85,6 @@ export default function CustomerBookingConfirm({ navigation, route }) {
           </View>
         </View>
 
-        {/* Service Location */}
         <View style={styles.sectionBlock}>
           <Text style={styles.sectionTitle}>Service Location</Text>
           <View style={styles.locationInputWrap}>
@@ -104,7 +100,6 @@ export default function CustomerBookingConfirm({ navigation, route }) {
           </View>
         </View>
 
-        {/* Date & Time */}
         <View style={styles.sectionBlock}>
           <Text style={styles.sectionTitle}>Date & Time</Text>
           <View style={styles.rowGap}>
@@ -130,7 +125,6 @@ export default function CustomerBookingConfirm({ navigation, route }) {
           </View>
         </View>
 
-        {/* Special Instructions */}
         <View style={styles.sectionBlock}>
           <View style={styles.sectionTitleRow}>
             <Text style={styles.sectionTitle}>Special Instructions</Text>
@@ -164,7 +158,6 @@ export default function CustomerBookingConfirm({ navigation, route }) {
           </View>
         </View>
 
-        {/* Payment method */}
         <View style={styles.paymentCard}>
           <View style={styles.paymentLeft}>
             <View style={styles.paymentIconWrap}>
@@ -181,7 +174,6 @@ export default function CustomerBookingConfirm({ navigation, route }) {
         </View>
       </ScrollView>
 
-      {/* Bottom buttons */}
       <View style={styles.bottomBar}>
         <TouchableOpacity style={styles.confirmBtn} onPress={handleConfirm}>
           <Text style={styles.confirmText}>Confirm Book</Text>
@@ -501,4 +493,342 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "600",
   },
+});*/
+
+
+
+
+
+
+
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  Alert,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import axios from "axios";
+
+/* ================== CONFIG ================== */
+const API = "http://192.168.29.199:3000/api";
+/* ============================================ */
+
+export default function CustomerBookingConfirm({ navigation, route }) {
+  const { worker, customerId, workerId } = route?.params || {};
+
+  /* ================== SAFE WORKER OBJECT ================== */
+  const safeWorker = {
+    name: worker?.name || "Unknown Worker",
+    role: worker?.role || "Service",
+    rating: Number(worker?.rating || 0),
+    reviews: Number(worker?.reviews || 0),
+    avatar:
+      worker?.avatar || {
+        uri: "https://via.placeholder.com/100",
+      },
+    hourlyRate: Number(worker?.hourlyRate || 0),
+  };
+
+  const [address, setAddress] = useState("");
+  const [date, setDate] = useState("2024-07-28");
+  const [time, setTime] = useState("10:00 AM");
+  const [notes, setNotes] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  /* ================== CONFIRM BOOKING ================== */
+  const handleConfirm = async () => {
+    if (!customerId || !workerId) {
+      Alert.alert("Error", "Invalid customer or worker");
+      return;
+    }
+
+    if (!address.trim()) {
+      Alert.alert("Error", "Please enter service address");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const payload = {
+        customerId,
+        workerId,
+        service: {
+          name: safeWorker.role,
+          price: Number(safeWorker.hourlyRate || 0),
+        },
+        date,
+        time,
+        address,
+        notes,
+      };
+
+      console.log("📦 Booking payload:", payload);
+
+      await axios.post(`${API}/bookings/create`, payload);
+
+      Alert.alert("Success", "Booking created successfully");
+
+      // ✅ NAVIGATE TO CUSTOMER BOOKINGS (LIVE STATUS)
+      navigation.navigate("CustomerBookings", {
+        customerId,
+      });
+    } catch (err) {
+      console.log("❌ Booking error:", err.response?.data || err.message);
+
+      Alert.alert(
+        "Error",
+        err.response?.data?.message || "Failed to create booking"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* ================== UI ================== */
+  return (
+    <SafeAreaView style={styles.container}>
+      {/* HEADER */}
+      <View style={styles.headerRow}>
+        <TouchableOpacity
+          style={styles.headerIcon}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="chevron-back" size={22} color="#e5e7eb" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Confirm Booking</Text>
+        <View style={styles.headerIcon} />
+      </View>
+
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 140, paddingHorizontal: 20 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* WORKER CARD */}
+        <View style={styles.workerCard}>
+          <View style={styles.workerTop}>
+            <View style={styles.workerAvatarWrap}>
+              <Image source={safeWorker.avatar} style={styles.workerAvatar} />
+            </View>
+
+            <Text style={styles.workerName}>{safeWorker.name}</Text>
+
+            <View style={styles.workerTagWrap}>
+              <Text style={styles.workerTagText}>{safeWorker.role}</Text>
+            </View>
+
+            <View style={styles.ratingRow}>
+              <Ionicons name="star" size={14} color="#FACC15" />
+              <Text style={styles.ratingText}>
+                {safeWorker.rating.toFixed(1)}
+              </Text>
+              <Text style={styles.ratingSubText}>
+                ({safeWorker.reviews} reviews)
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.rateRow}>
+            <Text style={styles.rateLabel}>Hourly Rate</Text>
+            <Text style={styles.rateValue}>
+              ₹{safeWorker.hourlyRate.toFixed(2)}
+              <Text style={styles.rateUnit}> / hr</Text>
+            </Text>
+          </View>
+        </View>
+
+        {/* ADDRESS */}
+        <View style={styles.sectionBlock}>
+          <Text style={styles.sectionTitle}>Service Location</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter service address"
+            placeholderTextColor="#6b7280"
+            value={address}
+            onChangeText={setAddress}
+          />
+        </View>
+
+        {/* DATE & TIME */}
+        <View style={styles.sectionBlock}>
+          <Text style={styles.sectionTitle}>Date & Time</Text>
+          <View style={styles.rowGap}>
+            <TextInput
+              style={styles.input}
+              value={date}
+              onChangeText={setDate}
+            />
+            <TextInput
+              style={styles.input}
+              value={time}
+              onChangeText={setTime}
+            />
+          </View>
+        </View>
+
+        {/* NOTES */}
+        <View style={styles.sectionBlock}>
+          <Text style={styles.sectionTitle}>Special Instructions</Text>
+          <TextInput
+            style={styles.notesInput}
+            multiline
+            placeholder="Any special instructions..."
+            placeholderTextColor="#6b7280"
+            value={notes}
+            onChangeText={setNotes}
+          />
+        </View>
+      </ScrollView>
+
+      {/* BOTTOM ACTIONS */}
+      <View style={styles.bottomBar}>
+        <TouchableOpacity
+          style={[styles.confirmBtn, loading && styles.disabled]}
+          onPress={handleConfirm}
+          disabled={loading}
+        >
+          <Text style={styles.confirmText}>
+            {loading ? "Booking..." : "Confirm Book"}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.cancelBtn}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.cancelText}>Cancel</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+/* ================== STYLES ================== */
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#121212" },
+
+  headerRow: {
+    flexDirection: "row",
+    padding: 16,
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderBottomWidth: 1,
+    borderBottomColor: "#1f2937",
+  },
+
+  headerTitle: { color: "#fff", fontSize: 18, fontWeight: "700" },
+  headerIcon: { width: 40 },
+
+  workerCard: {
+    backgroundColor: "#1E1E1E",
+    borderRadius: 20,
+    padding: 20,
+    marginTop: 20,
+    borderWidth: 1,
+    borderColor: "#27272f",
+  },
+
+  workerTop: { alignItems: "center" },
+
+  workerAvatarWrap: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    overflow: "hidden",
+    marginBottom: 10,
+  },
+
+  workerAvatar: { width: "100%", height: "100%" },
+
+  workerName: { color: "#fff", fontSize: 18, fontWeight: "700" },
+
+  workerTagWrap: {
+    marginTop: 6,
+    backgroundColor: "rgba(0,255,133,0.15)",
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+
+  workerTagText: { color: "#00FF85", fontSize: 11, fontWeight: "700" },
+
+  ratingRow: { flexDirection: "row", alignItems: "center", marginTop: 6 },
+  ratingText: { color: "#fff", marginLeft: 4 },
+  ratingSubText: { color: "#9ca3af", marginLeft: 4 },
+
+  rateRow: {
+    marginTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#27272f",
+    paddingTop: 12,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+
+  rateLabel: { color: "#9ca3af" },
+  rateValue: { color: "#fff", fontSize: 16, fontWeight: "700" },
+  rateUnit: { color: "#9ca3af", fontSize: 12 },
+
+  sectionBlock: { marginTop: 24 },
+  sectionTitle: { color: "#fff", fontSize: 15, fontWeight: "700" },
+
+  input: {
+    backgroundColor: "#1E1E1E",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#374151",
+    padding: 12,
+    color: "#fff",
+    marginTop: 8,
+  },
+
+  rowGap: { flexDirection: "row", gap: 10 },
+
+  notesInput: {
+    backgroundColor: "#1E1E1E",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#374151",
+    padding: 12,
+    color: "#fff",
+    marginTop: 8,
+    minHeight: 80,
+    textAlignVertical: "top",
+  },
+
+  bottomBar: {
+    padding: 20,
+    borderTopWidth: 1,
+    borderTopColor: "#1f2937",
+    backgroundColor: "#121212",
+  },
+
+  confirmBtn: {
+    backgroundColor: "#00FF85",
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+
+  confirmText: { color: "#000", fontSize: 16, fontWeight: "700" },
+
+  cancelBtn: {
+    marginTop: 10,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#374151",
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+
+  cancelText: { color: "#e5e7eb", fontSize: 15, fontWeight: "600" },
+
+  disabled: { opacity: 0.6 },
 });

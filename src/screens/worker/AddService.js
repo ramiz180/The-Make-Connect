@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+/*import React, { useState } from "react";
 import {
   View,
   Text,
@@ -419,4 +419,146 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "700",
   },
+});*/
+
+
+
+
+
+
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from "react-native";
+import axios from "axios";
+
+const API = "http://192.168.29.199:3000/api";
+
+export default function AddService({ route, navigation }) {
+  const { userId } = route.params;
+
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+  const [experience, setExperience] = useState("");
+  const [services, setServices] = useState([]);
+
+  const addServiceLocally = () => {
+    if (!name) {
+      Alert.alert("Service name required");
+      return;
+    }
+
+    setServices((prev) => [
+      ...prev,
+      { name, price: Number(price), experience },
+    ]);
+
+    setName("");
+    setPrice("");
+    setExperience("");
+  };
+
+  const saveServices = async () => {
+    try {
+      await axios.post(`${API}/worker-services/add-services`, {
+        userId,
+        services,
+      });
+
+      Alert.alert("Success", "Services saved");
+      navigation.goBack();
+    } catch (err) {
+      Alert.alert("Error", "Failed to save services");
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Add Your Services</Text>
+
+      <TextInput
+        placeholder="Service name (e.g. Electrician)"
+        placeholderTextColor="#888"
+        style={styles.input}
+        value={name}
+        onChangeText={setName}
+      />
+
+      <TextInput
+        placeholder="Price (optional)"
+        placeholderTextColor="#888"
+        style={styles.input}
+        keyboardType="numeric"
+        value={price}
+        onChangeText={setPrice}
+      />
+
+      <TextInput
+        placeholder="Experience (e.g. 2 years)"
+        placeholderTextColor="#888"
+        style={styles.input}
+        value={experience}
+        onChangeText={setExperience}
+      />
+
+      <TouchableOpacity style={styles.addBtn} onPress={addServiceLocally}>
+        <Text style={styles.addBtnText}>+ Add Service</Text>
+      </TouchableOpacity>
+
+      {services.map((s, i) => (
+        <View key={i} style={styles.serviceItem}>
+          <Text style={styles.serviceText}>{s.name}</Text>
+          <Text style={styles.serviceSub}>
+            ₹{s.price || "N/A"} • {s.experience || "—"}
+          </Text>
+        </View>
+      ))}
+
+      <TouchableOpacity style={styles.saveBtn} onPress={saveServices}>
+        <Text style={styles.saveBtnText}>Save Services</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#000", padding: 16 },
+  title: { color: "#fff", fontSize: 22, fontWeight: "700", marginBottom: 16 },
+  input: {
+    backgroundColor: "#111",
+    color: "#fff",
+    borderRadius: 10,
+    padding: 14,
+    marginBottom: 12,
+  },
+  addBtn: {
+    backgroundColor: "#31FE83",
+    padding: 14,
+    borderRadius: 10,
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  addBtnText: { color: "#000", fontWeight: "700" },
+  serviceItem: {
+    backgroundColor: "#111",
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 8,
+  },
+  serviceText: { color: "#fff", fontWeight: "700" },
+  serviceSub: { color: "#aaa", fontSize: 12 },
+  saveBtn: {
+    backgroundColor: "#31FE83",
+    padding: 16,
+    borderRadius: 14,
+    alignItems: "center",
+    marginTop: 16,
+  },
+  saveBtnText: { color: "#000", fontWeight: "700", fontSize: 16 },
 });
+
